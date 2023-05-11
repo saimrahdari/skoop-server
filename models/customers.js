@@ -21,9 +21,17 @@ var Customer = new Schema({
 		default: 0,
 	},
 	fcm: {
-		type: 'String',
+		type: String,
 		default: '',
 	},
+	full_name: { type: String },
+	picture: { type: String, default: '' },
+	tips: { type: Number, default: 0 },
+	rides: { type: Number, default: 0 },
+	rating: { type: Number, default: 0 },
+	reviews: { type: Number, default: 0 },
+	latitude: { type: 'String', default: '' },
+	longitude: { type: 'String', default: '' },
 });
 
 Customer.plugin(passportLocalMongoose, {

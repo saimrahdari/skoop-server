@@ -12,6 +12,7 @@ var ErrorHandler = require('./utils/error');
 var connection = require('./utils/connection');
 
 var Customer = require('./routes/customerRoutes');
+var Restaurant = require('./routes/restaurantRoutes');
 
 app.listen(process.env.PORT, () => {
 	console.log(`Running on port ${process.env.PORT} 👍.`);
@@ -34,8 +35,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/customers', Customer);
+app.use('/restaurant', Restaurant);
+app.use('/', (req, res, next) => {
+	res.send('<h1>Api is working 🔶.</h1>');
+});
 
-app.all('*', function (req, res, next) {
+app.all('*', (req, res, next) => {
 	next(new ErrorHandler('Bad Request', 404));
 });
 app.use(errorMiddleware);

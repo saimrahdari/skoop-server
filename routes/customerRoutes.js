@@ -18,6 +18,21 @@ router.post(
 	passport.authenticate('local'),
 	customerController.signIn
 );
-router.patch('/passwordreset', customerController.passwordReset);
+router.patch('/reset-password', customerController.passwordReset);
+router.patch(
+	'/edit-customer',
+	authenticate.verifyCustomer,
+	customerController.editCustomer
+);
+router.patch(
+	'/change-password',
+	passport.authenticate('local'),
+	customerController.passwordReset
+);
+router.patch(
+	'/change-role',
+	authenticate.verifyCustomer,
+	customerController.switchRoles
+);
 
 module.exports = router;

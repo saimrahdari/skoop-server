@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Delivery_Address = new Schema({
+var DeliveryAddress = new Schema({
 	location_name: {
 		type: 'String',
 	},
@@ -9,4 +9,4 @@ var Delivery_Address = new Schema({
 	longitude: { type: String },
 });
 
-module.exports = mongoose.model('Delivery_Addresses', Delivery_Address);
+module.exports = mongoose.model('DeliveryAddress', DeliveryAddress);

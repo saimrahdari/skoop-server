@@ -31,6 +31,7 @@ exports.register = async (req, res, next) => {
 				new Customer({
 					student_id: req.body.student_id,
 					email: req.body.email,
+					full_name: req.body.full_name,
 				}),
 				req.body.password
 			);
@@ -54,13 +55,13 @@ exports.register = async (req, res, next) => {
 };
 
 exports.signIn = asyncHandler(async (req, res) => {
-	let token = authenticate.getToken({ _id: req.Customer._id });
+	let token = authenticate.getToken({ _id: req.user._id });
 	let update = { fcm: req.body.token };
-	await Customer.findByIdAndUpdate(req.Customer._id, update);
+	await Customer.findByIdAndUpdate(req.user._id, update);
 	res.status(200).json({
 		success: true,
 		token: token,
-		customer: req.Customer._id,
+		customer: req.user._id,
 	});
 });
 
@@ -121,25 +122,34 @@ exports.verifyOtp = asyncHandler(async (req, res, next) => {
 });
 
 exports.passwordReset = asyncHandler(async (req, res, next) => {
-	let Customer = await Customer.findOne({ email: req.body.email });
-	let newCustomer = await Customer.setPassword(req.body.password);
+	let customer = await Customer.findOne({ email: req.body.email });
+	let newCustomer = await customer.setPassword(req.body.password);
 	newCustomer.save();
 	res.status(204).json();
 });
 
-// exports.profilePicture = asyncHandler(async (req, res, next) => {
-// 	let update = { picture: req.source };
-// 	let Customer = await Customer.findByIdAndUpdate(req.Customer._id, update);
-// 	res.status(204).json();
-// });
+exports.editCustomer = asyncHandler(async (req, res) => {
+	let update = {
+		student_id: req.body.student_id,
+		email: req.body.email,
+		full_name: req.body.full_name,
+		picture: req.body.picture,
+	};
+	let doc = await Customer.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json({});
+});
 
-// exports.getPicture = asyncHandler(async (req, res, next) => {
-// 	res.sendFile(
-// 		path.join(__dirname, `..${req.params.picture}`),
-// 		function (err) {
-// 			if (err) {
-// 				next(err);
-// 			}
-// 		}
-// 	);
-// });
+exports.switchRoles = asyncHandler(async (req, res) => {
+	let update = {};
+	if (req.user.role === 'customer') {
+		update = {
+			role: 'skooper',
+		};
+	} else {
+		update = {
+			role: 'skooper',
+		};
+	}
+	let doc = await Customer.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json({});
+});
