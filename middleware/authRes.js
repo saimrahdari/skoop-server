@@ -8,6 +8,7 @@ var Restaurant = require('../models/restaurants');
 passport.serializeUser(Restaurant.serializeUser());
 passport.deserializeUser(Restaurant.deserializeUser());
 passport.use(
+	'local-res',
 	new LocalStrategy(
 		{
 			usernameField: 'email',
@@ -25,6 +26,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET;
 
 passport.use(
+	'local-res',
 	new JwtStrategy(opts, async (jwt_payload, done) => {
 		try {
 			const user = await Restaurant.findOne({ _id: jwt_payload._id });

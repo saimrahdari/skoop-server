@@ -8,7 +8,7 @@ var NotificationCustomer = new Schema(
 			ref: 'Customer',
 		},
 		message: {
-			type: 'String',
+			type: String,
 		},
 		read: {
 			type: Boolean,

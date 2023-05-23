@@ -15,9 +15,7 @@ var Otp = require('../models/otp');
 
 exports.register = async (req, res, next) => {
 	var exists = [];
-	exists = await Restaurant.find({
-		$or: [{ email: req.body.email }, { student_id: req.body.student_id }],
-	});
+	exists = await Restaurant.find({ email: req.body.email });
 	if (exists.length !== 0) {
 		next(new ErrorHandler('Restaurant already exists.', 409));
 	} else {
@@ -33,7 +31,7 @@ exports.register = async (req, res, next) => {
 			if (restaurant) {
 				try {
 					await restaurant.save();
-					passport.authenticate('local')(req, res, () => {
+					passport.authenticate('local-res')(req, res, () => {
 						res.status(201).json({
 							success: true,
 							status: 'Registration Successful!',

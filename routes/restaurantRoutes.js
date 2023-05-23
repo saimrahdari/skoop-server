@@ -14,7 +14,7 @@ router.get(
 router.post('/register', restaurantController.register);
 router.post(
 	'/sign-in',
-	passport.authenticate('local'),
+	passport.authenticate('local-res'),
 	restaurantController.signIn
 );
 router.patch('/reset-password', restaurantController.passwordReset);
