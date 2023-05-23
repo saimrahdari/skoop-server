@@ -26,7 +26,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET;
 
 passport.use(
-	'local-res',
+	'jwt-res',
 	new JwtStrategy(opts, async (jwt_payload, done) => {
 		try {
 			const user = await Restaurant.findOne({ _id: jwt_payload._id });
@@ -41,4 +41,4 @@ passport.use(
 	})
 );
 
-exports.verifyRestaurant = passport.authenticate('jwt', { session: false });
+exports.verifyRestaurant = passport.authenticate('jwt-res', { session: false });
