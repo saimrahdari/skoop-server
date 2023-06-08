@@ -120,3 +120,10 @@ exports.passwordReset = asyncHandler(async (req, res, next) => {
 	newRestaurant.save();
 	res.status(204).json();
 });
+
+exports.passwordChange = asyncHandler(async (req, res, next) => {
+	let restaurant = await Restaurant.findById(req.user._id);
+	let newRestaurant = await restaurant.setPassword(req.body.new_password);
+	newRestaurant.save();
+	res.status(204).json();
+});

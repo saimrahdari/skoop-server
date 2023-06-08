@@ -128,6 +128,13 @@ exports.passwordReset = asyncHandler(async (req, res, next) => {
 	res.status(204).json();
 });
 
+exports.passwordChange = asyncHandler(async (req, res, next) => {
+	let customer = await Customer.findById(req.user._id);
+	let newCustomer = await customer.setPassword(req.body.new_password);
+	newCustomer.save();
+	res.status(204).json();
+});
+
 exports.editCustomer = asyncHandler(async (req, res) => {
 	let update = {
 		student_id: req.body.student_id,

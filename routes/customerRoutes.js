@@ -27,7 +27,7 @@ router.patch(
 router.patch(
 	'/change-password',
 	passport.authenticate('local'),
-	customerController.passwordReset
+	customerController.passwordChange
 );
 router.patch(
 	'/change-role',

@@ -20,7 +20,7 @@ router.post(
 router.patch('/reset-password', restaurantController.passwordReset);
 router.patch(
 	'/change-password',
-	passport.authenticate('local'),
-	restaurantController.passwordReset
+	passport.authenticate('local-res'),
+	restaurantController.passwordChange
 );
 module.exports = router;
