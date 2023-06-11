@@ -20,7 +20,6 @@ var Restaurant = new Schema({
 		type: Number,
 		default: 0,
 	},
-	food_categories: [String],
 	fcm: {
 		type: String,
 		default: '',

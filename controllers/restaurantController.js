@@ -133,25 +133,17 @@ exports.passwordChange = asyncHandler(async (req, res, next) => {
 exports.addCategory = asyncHandler(async (req, res, next) => {
 	var exist = await FoodCategory.findOne({
 		restaurant: req.user._id,
-		title: req.body.title,
+		title: req.body.title.toLowerCase(),
 	});
 	if (exist) {
 		return res.status(409).json({ message: 'Already exists.' });
 	}
 	await FoodCategory.create({
-		title: req.body.title,
+		title: req.body.title.toLowerCase(),
 		description: req.body.description,
 		image: req.body.image,
 		restaurant: req.user._id,
 	});
-	await Restaurant.findByIdAndUpdate(
-		{ _id: req.user._id },
-		{
-			$addToSet: {
-				food_categories: req.body.title.toLowerCase(),
-			},
-		}
-	);
 	res.status(204).json({});
 });
 
@@ -184,20 +176,12 @@ exports.viewFoodItems = asyncHandler(async (req, res, next) => {
 
 exports.editFoodCategory = asyncHandler(async (req, res, next) => {
 	let update = {
-		title: req.body.title,
+		title: req.body.title.toLowerCase(),
 		description: req.body.description,
 		image: req.body.image,
 		restaurant: req.user._id,
 	};
 	await FoodCategory.findByIdAndUpdate(req.params.id, update);
-	await Restaurant.findByIdAndUpdate(
-		{ _id: req.user._id },
-		{
-			$addToSet: {
-				food_categories: req.body.title.toLowerCase(),
-			},
-		}
-	);
 	res.status(204).json({});
 });
 
