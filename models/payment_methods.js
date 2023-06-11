@@ -3,12 +3,12 @@ var Schema = mongoose.Schema;
 
 var Payment_Method = new Schema({
 	card_title: {
-		type: 'String',
+		type: String,
 	},
 	card_number: { type: Number },
 	cvc: { type: Number },
 	expiry_date: {
-		type: 'String',
+		type: String,
 	},
 	user: {
 		type: mongoose.Types.ObjectId,

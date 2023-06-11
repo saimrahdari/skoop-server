@@ -12,6 +12,8 @@ var ErrorHandler = require('../utils/error');
 
 var Restaurant = require('../models/restaurants');
 var Otp = require('../models/otp');
+var FoodCategory = require('../models/food_categories');
+var FoodItem = require('../models/food_items');
 
 exports.register = async (req, res, next) => {
 	var exists = [];
@@ -126,4 +128,106 @@ exports.passwordChange = asyncHandler(async (req, res, next) => {
 	let newRestaurant = await restaurant.setPassword(req.body.new_password);
 	newRestaurant.save();
 	res.status(204).json();
+});
+
+exports.addCategory = asyncHandler(async (req, res, next) => {
+	var exist = await FoodCategory.findOne({
+		restaurant: req.user._id,
+		title: req.body.title,
+	});
+	if (exist) {
+		return res.status(409).json({ message: 'Already exists.' });
+	}
+	await FoodCategory.create({
+		title: req.body.title,
+		description: req.body.description,
+		image: req.body.image,
+		restaurant: req.user._id,
+	});
+	await Restaurant.findByIdAndUpdate(
+		{ _id: req.user._id },
+		{
+			$addToSet: {
+				food_categories: req.body.title.toLowerCase(),
+			},
+		}
+	);
+	res.status(204).json({});
+});
+
+exports.addFoodItem = asyncHandler(async (req, res, next) => {
+	await FoodItem.create({
+		name: req.body.name,
+		price: req.body.price,
+		ingredient: req.body.ingredient,
+		description: req.body.description,
+		food_category: req.body.food_category,
+		image: req.body.image,
+		restaurant: req.user._id,
+	});
+	res.status(204).json({});
+});
+
+exports.viewFoodCategory = asyncHandler(async (req, res, next) => {
+	const foodCategory = await FoodCategory.find({
+		restaurant: req.user._id,
+	});
+	res.status(200).json({ foodCategory });
+});
+
+exports.viewFoodItems = asyncHandler(async (req, res, next) => {
+	const foodItems = await FoodItem.find({
+		restaurant: req.user._id,
+	});
+	res.status(200).json({ foodItems });
+});
+
+exports.editFoodCategory = asyncHandler(async (req, res, next) => {
+	let update = {
+		title: req.body.title,
+		description: req.body.description,
+		image: req.body.image,
+		restaurant: req.user._id,
+	};
+	await FoodCategory.findByIdAndUpdate(req.params.id, update);
+	await Restaurant.findByIdAndUpdate(
+		{ _id: req.user._id },
+		{
+			$addToSet: {
+				food_categories: req.body.title.toLowerCase(),
+			},
+		}
+	);
+	res.status(204).json({});
+});
+
+exports.editFoodItem = asyncHandler(async (req, res, next) => {
+	let update = {
+		name: req.body.name,
+		price: req.body.price,
+		ingredient: req.body.ingredient,
+		description: req.body.description,
+		food_category: req.body.food_category,
+		image: req.body.image,
+		restaurant: req.user._id,
+	};
+	await FoodItem.findByIdAndUpdate(req.params.id, update);
+	res.status(204).json({});
+});
+
+exports.deleteCategory = asyncHandler(async (req, res, next) => {
+	await FoodCategory.deleteOne({
+		_id: req.params.fid,
+	});
+	await FoodItem.deleteMany({
+		food_category: req.params.fid,
+	});
+	res.status(204).json({});
+});
+
+exports.deleteFoodItem = asyncHandler(async (req, res, next) => {
+	await FoodItem.deleteOne({
+		_id: req.params.fid,
+	});
+	res.status(204).json({});
 });

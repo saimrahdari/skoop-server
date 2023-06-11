@@ -3,7 +3,6 @@ var passport = require('passport');
 var bodyParser = require('body-parser');
 var router = express.Router();
 var nodemailer = require('nodemailer');
-var path = require('path');
 router.use(bodyParser.json());
 
 var authenticate = require('../middleware/auth');
@@ -11,7 +10,9 @@ var asyncHandler = require('../middleware/asyncHandler');
 var ErrorHandler = require('../utils/error');
 
 var Customer = require('../models/customers');
+var Restaurant = require('../models/restaurants');
 var Otp = require('../models/otp');
+var DeliveryAddress = require('../models/delivery_addresses');
 
 exports.register = async (req, res, next) => {
 	var exists = [];
@@ -157,6 +158,59 @@ exports.switchRoles = asyncHandler(async (req, res) => {
 			role: 'skooper',
 		};
 	}
-	let doc = await Customer.findByIdAndUpdate(req.user._id, update);
+	await Customer.findByIdAndUpdate(req.user._id, update);
 	res.status(204).json({});
+});
+
+exports.editCustomer = asyncHandler(async (req, res) => {
+	let update = {
+		student_id: req.body.student_id,
+		email: req.body.email,
+		full_name: req.body.full_name,
+		picture: req.body.picture,
+	};
+	await Customer.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json({});
+});
+
+exports.addAddress = asyncHandler(async (req, res) => {
+	await DeliveryAddress.create(req.body);
+	res.status(201).json({});
+});
+
+exports.getAddress = asyncHandler(async (req, res) => {
+	const addresses = await DeliveryAddress.find({ customer: req.user._id });
+	res.status(200).json({ addresses });
+});
+
+exports.addReview = asyncHandler(async (req, res) => {
+	await Restaurant.findByIdAndUpdate(
+		{ _id: req.body.restaurantId },
+		{
+			$push: {
+				reviews: {
+					message: req.body.message,
+					stars: req.body.stars,
+					customer: req.user._id,
+					orderId: req.body.orderId,
+				},
+			},
+		},
+		{ new: true, upset: false }
+	);
+	res.status(204).json({});
+});
+
+exports.getRestaurants = asyncHandler(async (req, res) => {
+	const restaurants = await Restaurant.find({})
+		.sort({ reviews: -1 })
+		.limit(5);
+	res.status(200).json({ restaurants });
+});
+
+exports.getPizzaBurgerRestaurant = asyncHandler(async (req, res) => {
+	const restaurants = await Restaurant.find({
+		$or: [{ food_categories: 'pizza' }, { food_categories: 'burger' }],
+	});
+	res.status(200).json({ restaurants });
 });

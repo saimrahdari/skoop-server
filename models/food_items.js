@@ -10,7 +10,7 @@ var FoodItem = new Schema({
 		type: mongoose.Types.ObjectId,
 		ref: 'FoodCategory',
 	},
-	images: [String],
+	image: { type: String },
 	restaurant: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
 });
 

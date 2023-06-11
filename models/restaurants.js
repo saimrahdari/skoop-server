@@ -29,10 +29,10 @@ var Restaurant = new Schema({
 		type: [
 			{
 				day: {
-					type: 'String',
+					type: String,
 				},
 				time: {
-					type: 'String',
+					type: String,
 				},
 				availability: {
 					type: Boolean,
@@ -45,12 +45,13 @@ var Restaurant = new Schema({
 	picture: { type: String, default: '' },
 	cover_photo: { type: String, default: '' },
 	open: { type: Boolean, default: false },
-	latitude: { type: 'String', default: '' },
-	longitude: { type: 'String', default: '' },
+	latitude: { type: String, default: '' },
+	longitude: { type: String, default: '' },
 	orders: { type: Number, default: 0 },
 	sales: { type: Number, default: 0 },
-	plan: { type: 'String', default: '' },
+	plan: { type: String, default: '' },
 	plan_ending_date: { type: Date, default: null },
+	reviews: { type: Array, default: [] },
 });
 
 Restaurant.plugin(passportLocalMongoose, {
