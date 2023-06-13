@@ -213,12 +213,10 @@ exports.getPizzaBurgerRestaurant = asyncHandler(async (req, res) => {
 	const restaurants = await FoodCategory.find({
 		$or: [{ title: 'pizza' }, { title: 'burger' }],
 	}).select('restaurant -_id');
-	console.log(restaurants);
 	var ids = [];
 	for (let index = 0; index < restaurants.length; index++) {
 		ids.push(restaurants[index].restaurant);
 	}
-	console.log(ids);
 	const finalData = await Restaurant.find({ _id: { $in: ids } });
 	res.status(200).json({ restaurants: finalData });
 });
