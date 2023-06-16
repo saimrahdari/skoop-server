@@ -1,9 +1,5 @@
-var express = require('express');
 var passport = require('passport');
-var bodyParser = require('body-parser');
-var router = express.Router();
 var nodemailer = require('nodemailer');
-router.use(bodyParser.json());
 
 var authenticate = require('../middleware/auth');
 var asyncHandler = require('../middleware/asyncHandler');
