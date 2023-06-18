@@ -12,11 +12,10 @@ var DeliveryAddress = require('../models/delivery_addresses');
 var FoodCategory = require('../models/food_categories');
 
 exports.register = async (req, res, next) => {
-	var exists = [];
-	exists = await Customer.find({
+	var exists = await Customer.findOne({
 		$or: [{ email: req.body.email }, { student_id: req.body.student_id }],
 	});
-	if (exists.length !== 0) {
+	if (exists) {
 		next(
 			new ErrorHandler(
 				'Email or StudentId already associated with an account',
