@@ -11,9 +11,8 @@ var FoodCategory = require('../models/food_categories');
 var FoodItem = require('../models/food_items');
 
 exports.register = async (req, res, next) => {
-	var exists = [];
-	exists = await Restaurant.find({ email: req.body.email });
-	if (exists.length !== 0) {
+	var exists = await Restaurant.findOne({ email: req.body.email });
+	if (exists) {
 		next(new ErrorHandler('Restaurant already exists.', 409));
 	} else {
 		try {
@@ -60,10 +59,8 @@ exports.getRestaurant = asyncHandler(async (req, res) => {
 });
 
 exports.getOtp = asyncHandler(async (req, res, next) => {
-	var exists = [];
-	exists = await Restaurant.find({ email: req.params.email });
-
-	if (exists.length === 0) {
+	var exists = await Restaurant.findOne({ email: req.params.email });
+	if (!exists) {
 		next(new ErrorHandler('Email does not exist', 404));
 	} else {
 		var existing = await Otp.find({ email: req.params.email });
@@ -88,7 +85,6 @@ exports.getOtp = asyncHandler(async (req, res, next) => {
 			subject: 'OTP Verification',
 			text: `Your four-digit verification code is: ${code}`,
 		};
-
 		transport.sendMail(mailOptions, function (err, info) {
 			if (err) {
 				next(new ErrorHandler('Internal Server Error', 500));

@@ -50,7 +50,22 @@ var Restaurant = new Schema({
 	sales: { type: Number, default: 0 },
 	plan: { type: String, default: '' },
 	plan_ending_date: { type: Date, default: null },
-	reviews: { type: Array, default: [] },
+	reviews: {
+		type: [
+			{
+				customer: {
+					type: mongoose.Types.ObjectId,
+					ref: 'Customer',
+				},
+				message: { type: String },
+				stars: { type: Number },
+				orderID: {
+					type: mongoose.Types.ObjectId,
+					ref: 'Order',
+				},
+			},
+		],
+	},
 });
 
 Restaurant.plugin(passportLocalMongoose, {

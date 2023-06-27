@@ -32,6 +32,16 @@ var Customer = new Schema({
 	reviews: { type: Number, default: 0 },
 	latitude: { type: 'String', default: '' },
 	longitude: { type: 'String', default: '' },
+	favourite: {
+		type: [
+			{
+				rid: {
+					type: mongoose.Types.ObjectId,
+					ref: 'Restaurant',
+				},
+			},
+		],
+	},
 });
 
 Customer.plugin(passportLocalMongoose, {

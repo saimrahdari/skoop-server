@@ -13,6 +13,36 @@ router.get(
 	customerController.getAddress
 );
 router.get(
+	'/getrestaurantdetails/:id',
+	authenticate.verifyCustomer,
+	customerController.getRestaurantWithCategoryItems
+);
+router.get(
+	'/get-orders',
+	authenticate.verifyCustomer,
+	customerController.getOrders
+);
+router.get(
+	'/get-order/:id',
+	authenticate.verifyCustomer,
+	customerController.getSingleOrder
+);
+router.get(
+	'/active-orders',
+	authenticate.verifyCustomer,
+	customerController.getActiveOrder
+);
+router.get(
+	'/get-reviews/:id',
+	authenticate.verifyCustomer,
+	customerController.getReviews
+);
+router.get(
+	'/past-orders',
+	authenticate.verifyCustomer,
+	customerController.getPastOrder
+);
+router.get(
 	'/customer',
 	authenticate.verifyCustomer,
 	customerController.getCustomer
@@ -21,6 +51,11 @@ router.get(
 	'/view-featuredrestaurants',
 	authenticate.verifyCustomer,
 	customerController.getRestaurants
+);
+router.get(
+	'/view-favouriterestaurants',
+	authenticate.verifyCustomer,
+	customerController.getFavouriteRestaurant
 );
 router.get(
 	'/view-pizzaburgerrestaurants',
@@ -32,6 +67,16 @@ router.post(
 	'/sign-in',
 	passport.authenticate('local'),
 	customerController.signIn
+);
+router.post(
+	'/create-order',
+	authenticate.verifyCustomer,
+	customerController.createOrder
+);
+router.post(
+	'/add-deliveryaddress',
+	authenticate.verifyCustomer,
+	customerController.addAddress
 );
 router.put(
 	'/add-review',
@@ -54,10 +99,20 @@ router.patch(
 	authenticate.verifyCustomer,
 	customerController.switchRoles
 );
-router.post(
-	'/add-deliveryaddress',
+router.patch(
+	'/set-favourite/:id',
 	authenticate.verifyCustomer,
-	customerController.addAddress
+	customerController.setFavouriteRestaurant
+);
+router.patch(
+	'/remove-favourite/:id',
+	authenticate.verifyCustomer,
+	customerController.removeFavouriteRestaurant
+);
+router.patch(
+	'/cancel-order/:id',
+	authenticate.verifyCustomer,
+	customerController.cancelOrder
 );
 
 module.exports = router;
