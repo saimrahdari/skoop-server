@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
 		try {
 			const restaurant = await Restaurant.register(
 				new Restaurant({
-					restaurant_name: req.body.restaurant_id,
+					restaurant_name: req.body.restaurant_name,
 					email: req.body.email,
 					phone_number: req.body.phone_number,
 				}),

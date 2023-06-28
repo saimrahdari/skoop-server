@@ -150,7 +150,7 @@ exports.switchRoles = asyncHandler(async (req, res) => {
 		};
 	} else {
 		update = {
-			role: 'skooper',
+			role: 'customer',
 		};
 	}
 	await Customer.findByIdAndUpdate(req.user._id, update);
@@ -163,6 +163,7 @@ exports.editCustomer = asyncHandler(async (req, res) => {
 		email: req.body.email,
 		full_name: req.body.full_name,
 		picture: req.body.picture,
+		phone_number: req.body.phone_number,
 	};
 	await Customer.findByIdAndUpdate(req.user._id, update);
 	res.status(204).json({});
