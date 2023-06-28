@@ -9,6 +9,8 @@ var Restaurant = require('../models/restaurants');
 var Otp = require('../models/otp');
 var FoodCategory = require('../models/food_categories');
 var FoodItem = require('../models/food_items');
+var FoodDeals = require('../models/food_deals');
+var Order = require('../models/orders');
 
 exports.register = async (req, res, next) => {
 	var exists = await Restaurant.findOne({ email: req.body.email });
@@ -205,4 +207,59 @@ exports.deleteFoodItem = asyncHandler(async (req, res, next) => {
 		_id: req.params.fid,
 	});
 	res.status(204).json({});
+});
+
+exports.addFoodDeal = asyncHandler(async (req, res, next) => {
+	await FoodDeals.create({
+		title: req.body.title,
+		images: req.body.images,
+		price: req.body.price,
+		description: req.body.description,
+		restaurant: req.user._id,
+		starting_date: req.body.starting_date,
+		ending_date: req.body.ending_date,
+		food_items: req.body.foodItems,
+	});
+	res.status(201).json({ message: 'Deal created successfully.' });
+});
+
+exports.editFoodDeal = asyncHandler(async (req, res, next) => {
+	let update = {
+		title: req.body.title,
+		images: req.body.images,
+		price: req.body.price,
+		description: req.body.description,
+		restaurant: req.user._id,
+		starting_date: req.body.starting_date,
+		ending_date: req.body.ending_date,
+		food_items: req.body.foodItems,
+	};
+	await FoodDeals.findByIdAndUpdate(req.params.id, update);
+	res.status(202).json({});
+});
+
+exports.getSingleDeal = asyncHandler(async (req, res, next) => {
+	const foodDeal = await FoodDeals.findById(req.params.id);
+	res.status(200).json(foodDeal);
+});
+
+exports.getAllDeals = asyncHandler(async (req, res, next) => {
+	const foodDeals = await FoodDeals.find({ restaurant: req.user._id });
+	res.status(200).json(foodDeals);
+});
+
+exports.deleteFoodDeal = asyncHandler(async (req, res, next) => {
+	await FoodDeals.deleteOne({
+		_id: req.params.id,
+	});
+	res.status(204).json({});
+});
+
+exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
+	const foodItems = await FoodItem.find({ restaurant: req.user._id }, '_id');
+	const orders = await Order.find({
+		'foodItems.item': { $in: foodItems },
+		status: req.params.status,
+	});
+	res.status(200).json(orders);
 });

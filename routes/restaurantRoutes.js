@@ -12,6 +12,11 @@ router.get(
 	restaurantController.getRestaurant
 );
 router.get(
+	'/get-ordersbystatus/:status',
+	authenticate.verifyRestaurant,
+	restaurantController.getOrdersByStatus
+);
+router.get(
 	'/viewfoodcategory',
 	authenticate.verifyRestaurant,
 	restaurantController.viewFoodCategory
@@ -20,6 +25,16 @@ router.get(
 	'/viewfooditems',
 	authenticate.verifyRestaurant,
 	restaurantController.viewFoodItems
+);
+router.get(
+	'/single-fooddeal/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.getSingleDeal
+);
+router.get(
+	'/all-fooddeals',
+	authenticate.verifyRestaurant,
+	restaurantController.getAllDeals
 );
 router.get(
 	'/restaurant',
@@ -42,6 +57,11 @@ router.post(
 	authenticate.verifyRestaurant,
 	restaurantController.addFoodItem
 );
+router.post(
+	'/add-fooddeal',
+	authenticate.verifyRestaurant,
+	restaurantController.addFoodDeal
+);
 router.patch('/reset-password', restaurantController.passwordReset);
 router.patch(
 	'/change-password',
@@ -58,6 +78,11 @@ router.patch(
 	authenticate.verifyRestaurant,
 	restaurantController.editFoodItem
 );
+router.patch(
+	'/edit-fooddeal/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.editFoodDeal
+);
 router.delete(
 	'/delete-foodcategory/:fid',
 	authenticate.verifyRestaurant,
@@ -67,5 +92,10 @@ router.delete(
 	'/delete-fooditem/:fid',
 	authenticate.verifyRestaurant,
 	restaurantController.deleteFoodItem
+);
+router.delete(
+	'/delete-fooddeal/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.deleteFoodDeal
 );
 module.exports = router;

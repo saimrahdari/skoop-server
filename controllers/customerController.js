@@ -344,3 +344,8 @@ exports.getReviews = asyncHandler(async (req, res) => {
 	);
 	res.status(200).json(reviews.reviews);
 });
+
+exports.getFoodItems = asyncHandler(async (req, res) => {
+	const items = await FoodItem.find({}).sort({ _id: -1 }).limit(10);
+	res.status(200).json(items);
+});

@@ -38,6 +38,11 @@ router.get(
 	customerController.getReviews
 );
 router.get(
+	'/get-fooditems',
+	authenticate.verifyCustomer,
+	customerController.getFoodItems
+);
+router.get(
 	'/past-orders',
 	authenticate.verifyCustomer,
 	customerController.getPastOrder
