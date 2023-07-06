@@ -253,6 +253,15 @@ exports.getSingleOrder = asyncHandler(async (req, res) => {
 });
 
 exports.setFavouriteRestaurant = asyncHandler(async (req, res) => {
+	const favAlready = await Customer.findOne({
+		_id: req.user._id,
+		'favourite.rid': req.params.id,
+	});
+	if (favAlready) {
+		return res
+			.status(400)
+			.json({ message: 'Restaurant already favourite' });
+	}
 	await Customer.findByIdAndUpdate(
 		{ _id: req.user._id },
 		{
@@ -278,13 +287,6 @@ exports.removeFavouriteRestaurant = asyncHandler(async (req, res) => {
 		}
 	);
 	res.status(204).json({});
-});
-
-exports.getFavouriteRestaurant = asyncHandler(async (req, res) => {
-	const restaurants = await Customer.findById(req.user._id).populate(
-		'favourite.rid'
-	);
-	res.status(200).json({ favourite: restaurants.favourite });
 });
 
 exports.getFavouriteRestaurant = asyncHandler(async (req, res) => {
