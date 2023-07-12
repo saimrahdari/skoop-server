@@ -352,3 +352,8 @@ exports.getFoodItems = asyncHandler(async (req, res) => {
 	const items = await FoodItem.find({}).sort({ _id: -1 }).limit(10);
 	res.status(200).json(items);
 });
+
+exports.getSingleFoodItem = asyncHandler(async (req, res) => {
+	const item = await FoodItem.findById(req.params.id);
+	res.status(200).json(item);
+});
