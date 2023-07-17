@@ -48,6 +48,11 @@ router.get(
 	customerController.getSingleFoodItem
 );
 router.get(
+	'/get-singlefoodcategory/:id',
+	authenticate.verifyCustomer,
+	customerController.getSingleFoodCategory
+);
+router.get(
 	'/past-orders',
 	authenticate.verifyCustomer,
 	customerController.getPastOrder

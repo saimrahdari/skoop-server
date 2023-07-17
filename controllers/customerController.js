@@ -357,3 +357,10 @@ exports.getSingleFoodItem = asyncHandler(async (req, res) => {
 	const item = await FoodItem.findById(req.params.id);
 	res.status(200).json(item);
 });
+
+exports.getSingleFoodCategory = asyncHandler(async (req, res) => {
+	const category = await FoodCategory.findById(req.params.id).populate(
+		'restaurant'
+	);
+	res.status(200).json(category);
+});

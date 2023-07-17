@@ -17,9 +17,10 @@ var FoodDeals = new Schema(
 				},
 			],
 		},
-		starting_date: { type: Date, default: null },
-		ending_date: { type: Date, default: null },
+		starting_time: { type: String, default: null },
+		ending_time: { type: String, default: null },
 		restaurant: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
+		date: { type: Date, default: null },
 	},
 	{ timestamps: true }
 );

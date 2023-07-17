@@ -216,9 +216,10 @@ exports.addFoodDeal = asyncHandler(async (req, res, next) => {
 		price: req.body.price,
 		description: req.body.description,
 		restaurant: req.user._id,
-		starting_date: req.body.starting_date,
-		ending_date: req.body.ending_date,
+		starting_time: req.body.starting_time,
+		ending_time: req.body.ending_time,
 		food_items: req.body.foodItems,
+		date: req.body.date,
 	});
 	res.status(201).json({ message: 'Deal created successfully.' });
 });
