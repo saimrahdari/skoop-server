@@ -1,5 +1,13 @@
+var http = require('http');
 var express = require('express');
 var app = express();
+var socketIO = require('socket.io');
+var server = http.createServer(app);
+var io = socketIO(server, {
+	cors: {
+		origin: '*',
+	},
+});
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
@@ -13,8 +21,9 @@ var connection = require('./utils/connection');
 
 var Customer = require('./routes/customerRoutes');
 var Restaurant = require('./routes/restaurantRoutes');
+var Chat = require('./routes/chatRoutes');
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
 	console.log(`Running on port ${process.env.PORT} 👍.`);
 });
 connection.connectDB();
@@ -34,11 +43,42 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+//?Socket Start
+let users = [];
+const addUser = (userId, socketId) => {
+	!users.some(user => user.userId === userId) &&
+		users.push({ userId, socketId });
+};
+const removeUser = socketId => {
+	users = users.filter(user => user.socketId !== socketId);
+};
+const getUser = userId => {
+	return users.find(user => user.userId === userId);
+};
+io.on('connection', socket => {
+	console.log('a user connected.');
+	socket.on('addUser', userId => {
+		addUser(userId, socket.id);
+		io.emit('getUsers', users);
+	});
+	socket.on('sendMessage', ({ senderId, receiverId, text }) => {
+		const user = getUser(receiverId);
+		io.to(user.socketId).emit('getMessage', {
+			senderId,
+			text,
+		});
+	});
+	socket.on('disconnect', () => {
+		console.log('a user disconnected!');
+		removeUser(socket.id);
+		io.emit('getUsers', users);
+	});
+});
+//!Socket End
+
 app.use('/customers', Customer);
 app.use('/restaurant', Restaurant);
-app.use('/', (req, res, next) => {
-	res.send('<h1>Api is working 🔶.</h1>');
-});
+app.use('/chat', Chat);
 
 app.all('*', (req, res, next) => {
 	next(new ErrorHandler('Bad Request', 404));
