@@ -3,7 +3,6 @@ var Schema = mongoose.Schema;
 
 var Order = new Schema(
 	{
-		restaurant: { type: mongoose.Types.ObjectId, ref: 'Restaurant' },
 		scooper: { type: mongoose.Types.ObjectId, ref: 'Customer' },
 		customer: { type: mongoose.Types.ObjectId, ref: 'Customer' },
 		address: { type: mongoose.Types.ObjectId, ref: 'DeliveryAddress' },

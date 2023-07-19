@@ -132,6 +132,28 @@ exports.passwordChange = asyncHandler(async (req, res, next) => {
 });
 
 exports.editCustomer = asyncHandler(async (req, res) => {
+	if (req.user.email !== req.body.email) {
+		var exists = await Customer.findOne({
+			email: req.body.email,
+		});
+		if (exists) {
+			return res
+				.status(409)
+				.json({ message: 'Email already associated with a user.' });
+		}
+	}
+	if (req.user.student_id !== req.body.student_id) {
+		var exists = await Customer.findOne({
+			student_id: req.body.student_id,
+		});
+		if (exists) {
+			return res
+				.status(409)
+				.json({
+					message: 'Student-Id already associated with a user.',
+				});
+		}
+	}
 	let update = {
 		student_id: req.body.student_id,
 		email: req.body.email,

@@ -22,6 +22,7 @@ var connection = require('./utils/connection');
 var Customer = require('./routes/customerRoutes');
 var Restaurant = require('./routes/restaurantRoutes');
 var Chat = require('./routes/chatRoutes');
+var Admin = require('./routes/adminRoutes');
 
 server.listen(process.env.PORT, () => {
 	console.log(`Running on port ${process.env.PORT} 👍.`);
@@ -79,6 +80,7 @@ io.on('connection', socket => {
 app.use('/customers', Customer);
 app.use('/restaurant', Restaurant);
 app.use('/chat', Chat);
+app.use('/admin', Admin);
 
 app.all('*', (req, res, next) => {
 	next(new ErrorHandler('Bad Request', 404));

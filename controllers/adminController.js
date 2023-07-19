@@ -1,0 +1,242 @@
+var passport = require('passport');
+var nodemailer = require('nodemailer');
+var authenticate = require('../middleware/authAdmin');
+var asyncHandler = require('../middleware/asyncHandler');
+var ErrorHandler = require('../utils/error');
+
+var Customer = require('../models/customers');
+var Admin = require('../models/admin');
+var Order = require('../models/orders');
+var Restaurant = require('../models/restaurants');
+var Otp = require('../models/otp');
+
+exports.register = async (req, res, next) => {
+	var exists = await Admin.findOne({ email: req.body.email });
+	if (exists) {
+		next(new ErrorHandler('Email already associated with an account', 409));
+	} else {
+		try {
+			const admin = await Admin.register(
+				new Admin({
+					email: req.body.email,
+				}),
+				req.body.password
+			);
+			if (admin) {
+				try {
+					await admin.save();
+					passport.authenticate('local-admin')(req, res, () => {
+						res.status(201).json({
+							success: true,
+							status: 'Registration Successful!',
+						});
+					});
+				} catch (error) {
+					return next(error);
+				}
+			}
+		} catch (error) {
+			return next(error);
+		}
+	}
+};
+
+exports.signIn = asyncHandler(async (req, res) => {
+	let token = authenticate.getToken({ _id: req.user._id });
+	res.status(200).json({
+		success: true,
+		token: token,
+		admin: req.user._id,
+	});
+});
+
+exports.getOtp = asyncHandler(async (req, res, next) => {
+	var exists = await Admin.findOne({ email: req.params.email });
+	if (!exists) {
+		next(new ErrorHandler('Email does not exist', 404));
+	} else {
+		var existing = await Otp.find({ email: req.params.email });
+		if (existing.length > 0) {
+			await Otp.deleteOne({ email: req.params.email });
+		}
+		var a = Math.floor(1000 + Math.random() * 9000).toString();
+		var code = a.substring(-2);
+		await Otp.create({ token: code, email: req.params.email });
+		let transport = nodemailer.createTransport({
+			host: 'smtp.gmail.com',
+			port: 465,
+			secure: true,
+			auth: {
+				user: process.env.EMAIL,
+				pass: process.env.EMAIL_PASSWORD,
+			},
+		});
+		const mailOptions = {
+			from: process.env.EMAIL,
+			to: req.params.email,
+			subject: 'OTP Verification',
+			text: `Your four-digit verification code is: ${code}`,
+		};
+		transport.sendMail(mailOptions, function (err, info) {
+			if (err) {
+				next(new ErrorHandler('Internal Server Error', 500));
+			} else {
+				res.status(200).json();
+			}
+		});
+	}
+});
+
+exports.verifyOtp = asyncHandler(async (req, res, next) => {
+	let otp = req.params.otp;
+	let email = req.params.email;
+	let doc = await Otp.findOne({ email: email });
+	if (otp === doc.token) {
+		await Otp.deleteOne({ email: email });
+		res.status(200).json();
+	} else {
+		res.status(404).json({ message: 'Invalid or Expired token' });
+	}
+});
+
+exports.passwordReset = asyncHandler(async (req, res, next) => {
+	let admin = await Admin.findOne({ email: req.body.email });
+	let newAdmin = await admin.setPassword(req.body.password);
+	newAdmin.save();
+	res.status(201).json({ message: 'Successfully changed password.' });
+});
+
+exports.countUsers = asyncHandler(async (req, res, next) => {
+	req.totalUsers = await Customer.countDocuments();
+	next();
+});
+
+exports.newUsers = asyncHandler(async (req, res, next) => {
+	req.newUsers = await Customer.find().sort({ _id: -1 }).limit(4);
+	res.status(200).json({
+		totalUsers: req.totalUsers,
+		newUsers: req.newUsers,
+	});
+});
+
+exports.getAllUsers = asyncHandler(async (req, res, next) => {
+	const page = parseInt(req.query.page) || 1;
+	const perPage = 20;
+	const totalItems = await Customer.countDocuments();
+	const totalPages = Math.ceil(totalItems / perPage);
+	const allUsers = await Customer.find({})
+		.skip((page - 1) * perPage)
+		.limit(perPage);
+
+	var finalData = [];
+	for (let i = 0; i < allUsers.length; i++) {
+		var spentAmount = await Order.aggregate([
+			{ $match: { customer: allUsers[i]._id } },
+			{ $group: { _id: 'none', totalAmount: { $sum: '$total' } } },
+		]);
+		var obj = {
+			user: allUsers[i],
+			totalSpent: spentAmount.length > 0 ? spentAmount[0].totalAmount : 0,
+		};
+		finalData.push(obj);
+	}
+	res.status(200).json({
+		finalData: finalData,
+		totalItems: totalItems,
+		currentPage: page,
+		perPage: perPage,
+		totalPages: totalPages,
+	});
+});
+
+exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
+	const page = parseInt(req.query.page) || 1;
+	const perPage = 20;
+	const totalItems = await Restaurant.countDocuments();
+	const totalPages = Math.ceil(totalItems / perPage);
+	const allRestaurants = await Restaurant.find({})
+		.skip((page - 1) * perPage)
+		.limit(perPage);
+
+	var finalData = [];
+	for (let i = 0; i < allRestaurants.length; i++) {
+		var ratings = await Restaurant.aggregate([
+			{ $match: { _id: allRestaurants[i]._id } },
+			{
+				$unwind: '$reviews',
+			},
+			{
+				$group: {
+					_id: '$_id',
+					rating: { $avg: '$reviews.stars' },
+				},
+			},
+		]);
+		var obj = {
+			restaurant: allRestaurants[i],
+			rating: ratings.length > 0 ? ratings[0].rating : 5.0,
+		};
+		finalData.push(obj);
+	}
+	res.status(200).json({
+		finalData: finalData,
+		totalItems: totalItems,
+		currentPage: page,
+		perPage: perPage,
+		totalPages: totalPages,
+	});
+});
+
+exports.deleteRestaurant = asyncHandler(async (req, res, next) => {
+	const deleteRes = await Restaurant.findByIdAndDelete(req.params.id);
+	if (deleteRes) {
+		return res
+			.status(200)
+			.json({ message: 'Restaurant deleted successfully' });
+	} else {
+		next(new ErrorHandler('No such restaurantexists', 404));
+	}
+});
+
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+	const deleteUser = await Customer.findByIdAndDelete(req.params.id);
+	if (deleteUser) {
+		return res
+			.status(200)
+			.json({ message: 'Customer deleted successfully' });
+	} else {
+		next(new ErrorHandler('No such customer exists', 404));
+	}
+});
+
+exports.editUser = asyncHandler(async (req, res, next) => {
+	var currentUser = await Customer.findById(req.params.id);
+	if (currentUser.email !== req.body.email) {
+		var exists = await Customer.findOne({
+			email: req.body.email,
+		});
+		if (exists) {
+			return res
+				.status(409)
+				.json({ message: 'Email already associated with a user.' });
+		}
+	}
+	if (currentUser.email !== req.body.student_id) {
+		var exists = await Customer.findOne({
+			student_id: req.body.student_id,
+		});
+		if (exists) {
+			return res.status(409).json({
+				message: 'Student-Id already associated with a user.',
+			});
+		}
+	}
+	let update = {
+		student_id: req.body.student_id,
+		email: req.body.email,
+		full_name: req.body.full_name,
+		picture: req.body.picture,
+	};
+	await Customer.findByIdAndUpdate(req.params.id, update);
+	res.status(204).json({});
+});
