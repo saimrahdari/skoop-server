@@ -141,7 +141,7 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 		finalData.push(obj);
 	}
 	res.status(200).json({
-		finalData: finalData,
+		users: finalData,
 		totalItems: totalItems,
 		currentPage: page,
 		perPage: perPage,
@@ -179,7 +179,7 @@ exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
 		finalData.push(obj);
 	}
 	res.status(200).json({
-		finalData: finalData,
+		restaurants: finalData,
 		totalItems: totalItems,
 		currentPage: page,
 		perPage: perPage,
