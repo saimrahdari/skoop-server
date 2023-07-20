@@ -147,11 +147,9 @@ exports.editCustomer = asyncHandler(async (req, res) => {
 			student_id: req.body.student_id,
 		});
 		if (exists) {
-			return res
-				.status(409)
-				.json({
-					message: 'Student-Id already associated with a user.',
-				});
+			return res.status(409).json({
+				message: 'Student-Id already associated with a user.',
+			});
 		}
 	}
 	let update = {
@@ -240,7 +238,6 @@ exports.getPizzaBurgerRestaurant = asyncHandler(async (req, res) => {
 
 exports.createOrder = asyncHandler(async (req, res) => {
 	await Order.create({
-		restaurant: req.body.restaurant,
 		scooper: req.body.scooper,
 		customer: req.user._id,
 		address: req.body.address,
