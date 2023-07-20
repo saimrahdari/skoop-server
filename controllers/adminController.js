@@ -131,7 +131,7 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 	var finalData = [];
 	for (let i = 0; i < allUsers.length; i++) {
 		var spentAmount = await Order.aggregate([
-			{ $match: { customer: allUsers[i]._id } },
+			{ $match: { customer: allUsers[i]._id, status: 3 } },
 			{ $group: { _id: 'none', totalAmount: { $sum: '$total' } } },
 		]);
 		var obj = {
