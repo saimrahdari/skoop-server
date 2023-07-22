@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var authenticate = require('../middleware/authAdmin');
 var adminController = require('../controllers/adminController');
+const admin = require('../models/admin');
 
 router.get(
 	'/dashboard',
@@ -15,6 +16,17 @@ router.get(
 	'/all-restaurants',
 	authenticate.verifyAdmin,
 	adminController.getAllRestaurants
+);
+router.get(
+	'/fulluserinfo/:id',
+	authenticate.verifyAdmin,
+	adminController.fullCustomerInformation,
+	adminController.fullScooperInformation
+);
+router.get(
+	'/pastorders/:id',
+	authenticate.verifyAdmin,
+	adminController.getPastOrders
 );
 router.post('/register', adminController.register);
 router.post(

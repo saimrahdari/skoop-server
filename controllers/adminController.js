@@ -194,7 +194,7 @@ exports.deleteRestaurant = asyncHandler(async (req, res, next) => {
 			.status(200)
 			.json({ message: 'Restaurant deleted successfully' });
 	} else {
-		next(new ErrorHandler('No such restaurantexists', 404));
+		next(new ErrorHandler('No such restaurant exists', 404));
 	}
 });
 
@@ -239,4 +239,74 @@ exports.editUser = asyncHandler(async (req, res, next) => {
 	};
 	await Customer.findByIdAndUpdate(req.params.id, update);
 	res.status(204).json({});
+});
+
+exports.fullCustomerInformation = asyncHandler(async (req, res, next) => {
+	req.user = await Customer.findById(req.params.id);
+	var customerInformation = await Order.aggregate([
+		{ $match: { customer: req.user._id, status: 3 } },
+		{
+			$group: {
+				_id: 'none',
+				totalAmount: { $sum: '$total' },
+				totalOrders: { $sum: 1 },
+			},
+		},
+	]);
+	if (customerInformation.length > 0) {
+		req.userInfo = {
+			totalAmount: customerInformation[0].totalAmount,
+			totalOrders: customerInformation[0].totalOrders,
+		};
+	} else {
+		req.userInfo = {
+			totalAmount: 0,
+			totalOrders: 0,
+		};
+	}
+	next();
+});
+
+exports.fullScooperInformation = asyncHandler(async (req, res, next) => {
+	var skooperInformation = await Order.aggregate([
+		{ $match: { scooper: req.user._id, status: 3 } },
+		{
+			$group: {
+				_id: 'none',
+				totalCharges: { $sum: '$delivery_charges' },
+				totalOrders: { $sum: 1 },
+			},
+		},
+	]);
+	if (skooperInformation.length > 0) {
+		req.skooperInfo = {
+			totalEarned: skooperInformation[0].totalCharges,
+			totalOrders: skooperInformation[0].totalOrders,
+		};
+	} else {
+		req.skooperInfo = {
+			totalEarned: 0,
+			totalOrders: 0,
+		};
+	}
+	res.status(200).json({
+		userInformation: req.userInfo,
+		skooperInformation: req.skooperInfo,
+	});
+});
+
+exports.getPastOrders = asyncHandler(async (req, res, next) => {
+	if (req.query.role === 'customer' || {}) {
+		const data = await Order.find({
+			customer: req.params.id,
+			status: 3,
+		}).populate('foodItems');
+		res.status(200).json(data);
+	} else {
+		const data = await Order.find({
+			scooper: req.params.id,
+			status: 3,
+		}).populate('foodItems.item');
+		res.status(200).json(data);
+	}
 });
