@@ -299,8 +299,12 @@ exports.deleteFoodDeal = asyncHandler(async (req, res, next) => {
 
 exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
 	const foodItems = await FoodItem.find({ restaurant: req.user._id }, '_id');
+	var ids = [];
+	for (let i = 0; i < foodItems.length; i++) {
+		ids.push(foodItems[i]._id);
+	}
 	const orders = await Order.find({
-		'foodItems.item': { $in: foodItems },
+		'foodItems.item': { $in: ids },
 		status: req.params.status,
 	});
 	res.status(200).json(orders);
