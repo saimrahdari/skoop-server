@@ -5,8 +5,8 @@ var DeliveryAddress = new Schema({
 	location_name: {
 		type: String,
 	},
-	latitude: { type: String },
-	longitude: { type: String },
+	latitude: { type: Number },
+	longitude: { type: Number },
 	custom_name: { type: String },
 	customer: { type: mongoose.Types.ObjectId, ref: 'Customer' },
 });

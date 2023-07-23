@@ -155,6 +155,14 @@ exports.addLocation = asyncHandler(async (req, res, next) => {
 	res.status(204).json();
 });
 
+exports.addOpeningHours = asyncHandler(async (req, res, next) => {
+	let update = {
+		opening_hours: req.body.opening_hours,
+	};
+	await Restaurant.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json();
+});
+
 exports.addCategory = asyncHandler(async (req, res, next) => {
 	var exist = await FoodCategory.findOne({
 		restaurant: req.user._id,

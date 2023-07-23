@@ -188,6 +188,26 @@ exports.switchRoles = asyncHandler(async (req, res) => {
 });
 
 exports.editCustomer = asyncHandler(async (req, res) => {
+	if (req.user.email !== req.body.email) {
+		var exists = await Customer.findOne({
+			email: req.body.email,
+		});
+		if (exists) {
+			return res
+				.status(409)
+				.json({ message: 'Email already associated with a user.' });
+		}
+	}
+	if (req.user.student_id !== req.body.student_id) {
+		var exists = await Customer.findOne({
+			student_id: req.body.student_id,
+		});
+		if (exists) {
+			return res.status(409).json({
+				message: 'Student-Id already associated with a user.',
+			});
+		}
+	}
 	let update = {
 		student_id: req.body.student_id,
 		email: req.body.email,
@@ -252,7 +272,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
 		customer: req.user._id,
 		address: req.body.address,
 		status: req.body.status,
-		delivery_charges: req.body.charges,
+		delivery_charges: req.body.delivery_charges,
 		type: req.body.type,
 		tip: req.body.tip,
 		payment_method: req.body.payment_method,

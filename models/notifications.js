@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var NotificationCustomer = new Schema(
+var Notification = new Schema(
 	{
 		user: {
 			type: mongoose.Types.ObjectId,
@@ -26,4 +26,4 @@ var NotificationCustomer = new Schema(
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model('NotificationCustomer', NotificationCustomer);
+module.exports = mongoose.model('Notification', Notification);

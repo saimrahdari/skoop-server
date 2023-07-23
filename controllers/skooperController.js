@@ -32,7 +32,7 @@ const calculateDistance = (lat1, lat2, lon1, lon2) => {
 
 exports.getPastRides = asyncHandler(async (req, res, next) => {
 	const pastRides = await Order.find({
-		skooper: req.user._id,
+		scooper: req.user._id,
 		status: 3,
 	})
 		.populate('customer')
@@ -43,14 +43,14 @@ exports.getPastRides = asyncHandler(async (req, res, next) => {
 exports.getRequests = asyncHandler(async (req, res, next) => {
 	const getRequests = await Order.find({
 		status: 0,
-	}).populate('customer');
+	}).populate('address');
 
 	var finalRequests = [];
 	for (let i = 0; i < getRequests.length; i++) {
 		const point1 = { lat: req.user.latitude, lon: req.user.longitude };
 		const point2 = {
-			lat: getRequests[i].customer.latitude,
-			lon: getRequests[i].customer.longitude,
+			lat: getRequests[i].address.latitude,
+			lon: getRequests[i].address.longitude,
 		};
 		const distanceKm = calculateDistance(
 			point1.lat,
@@ -74,11 +74,11 @@ exports.getCurrentAcceptedRequests = asyncHandler(async (req, res, next) => {
 });
 
 exports.acceptRequest = asyncHandler(async (req, res, next) => {
-	const order = await Order.findById(req.params.id).populate('customer');
+	const order = await Order.findById(req.params.id).populate('address');
 	const point1 = { lat: req.user.latitude, lon: req.user.longitude };
 	const point2 = {
-		lat: order.customer.latitude,
-		lon: order.customer.longitude,
+		lat: order.address.latitude,
+		lon: order.address.longitude,
 	};
 	const distanceKm = calculateDistance(
 		point1.lat,
@@ -128,11 +128,11 @@ exports.getLocationofRestaurant = asyncHandler(async (req, res, next) => {
 });
 
 exports.getLocationofCustomer = asyncHandler(async (req, res, next) => {
-	const location = await Order.findById(req.params.id).populate('customer');
+	const location = await Order.findById(req.params.id).populate('address');
 	res.status(200).json({
 		location: {
-			latitude: location.restaurant.latitude,
-			longitude: location.restaurant.longitude,
+			latitude: location.address.latitude,
+			longitude: location.address.longitude,
 		},
 	});
 });
@@ -145,14 +145,13 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
 		remainingTime: 'None',
 	});
 	await Customer.findByIdAndUpdate(req.user._id, {
-		$inc: { tip: order.tip },
-		$inc: { rides: 1 },
+		$inc: { tips: order.tip, rides: 1 },
 	});
 	for (let i = 0; i < order.foodItems.length; i++) {
-		const res = await FoodItem.findById(order.foodItems[i].item).populate(
+		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
 			'restaurant'
 		);
-		await Restaurant.findByIdAndUpdate(res.restaurant._id, {
+		await Restaurant.findByIdAndUpdate(rest.restaurant._id, {
 			$inc: { orders: 1 },
 		});
 	}

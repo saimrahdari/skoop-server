@@ -31,8 +31,11 @@ var Restaurant = new Schema(
 					day: {
 						type: String,
 					},
-					time: {
-						type: String,
+					timeStart: {
+						type: Number,
+					},
+					timeEnd: {
+						type: Number,
 					},
 					availability: {
 						type: Boolean,

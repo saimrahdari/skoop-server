@@ -98,6 +98,11 @@ router.patch(
 	authenticate.verifyRestaurant,
 	restaurantController.editFoodDeal
 );
+router.patch(
+	'/openinghours',
+	authenticate.verifyRestaurant,
+	restaurantController.addOpeningHours
+);
 router.delete(
 	'/delete-foodcategory/:fid',
 	authenticate.verifyRestaurant,
