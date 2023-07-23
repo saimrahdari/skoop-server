@@ -12,6 +12,7 @@ var DeliveryAddress = require('../models/delivery_addresses');
 var FoodCategory = require('../models/food_categories');
 var Order = require('../models/orders');
 var FoodItem = require('../models/food_items');
+var PaymentMethod = require('../models/payment_methods');
 
 exports.register = async (req, res, next) => {
 	var exists = await Customer.findOne({
@@ -131,6 +132,15 @@ exports.passwordChange = asyncHandler(async (req, res, next) => {
 	res.status(204).json();
 });
 
+exports.addLocation = asyncHandler(async (req, res, next) => {
+	let update = {
+		latitude: req.body.latitude,
+		longitude: req.body.longitude,
+	};
+	await Customer.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json();
+});
+
 exports.editCustomer = asyncHandler(async (req, res) => {
 	if (req.user.email !== req.body.email) {
 		var exists = await Customer.findOne({
@@ -208,7 +218,7 @@ exports.addReview = asyncHandler(async (req, res) => {
 					message: req.body.message,
 					stars: req.body.stars,
 					customer: req.user._id,
-					orderId: req.body.orderId,
+					orderID: req.body.orderId,
 				},
 			},
 		},
@@ -251,6 +261,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
 		tax: req.body.tax,
 		total: req.body.total,
 		subtotal: req.body.subtotal,
+		card: req.body.card,
 	});
 	res.status(201).json({ message: 'Order Created Successfully.' });
 });
@@ -382,4 +393,44 @@ exports.getSingleFoodCategory = asyncHandler(async (req, res) => {
 		'restaurant'
 	);
 	res.status(200).json(category);
+});
+
+exports.addCard = asyncHandler(async (req, res) => {
+	let create = { ...req.body, user: req.user._id };
+	await PaymentMethod.create(create);
+	res.status(201).json({ message: 'Payment card added successgully.' });
+});
+
+exports.getAllCards = asyncHandler(async (req, res) => {
+	const cards = await PaymentMethod.find({ user: req.user._id });
+	res.status(200).json(cards);
+});
+
+exports.getSingleCard = asyncHandler(async (req, res) => {
+	const card = await PaymentMethod.findById(req.params.id);
+	res.status(200).json(card);
+});
+
+exports.addReviewOfSkooper = asyncHandler(async (req, res) => {
+	let update = {
+		rating: req.body.rating,
+		reviewer: req.user._id,
+		message: req.body.message,
+	};
+	await Order.findByIdAndUpdate(req.params.id, { scooperReview: update });
+	await Customer.findByIdAndUpdate(req.params.id, { $inc: { reviews: 1 } });
+	res.status(201).json({ message: 'Review added.' });
+});
+
+exports.recentOrdersFromSpecificRestaurant = asyncHandler(async (req, res) => {
+	const foodItems = await FoodItem.find({ restaurant: req.params.id });
+	var ids = [];
+	for (let i = 0; i < foodItems.length; i++) {
+		ids.push(foodItems[i]._id);
+	}
+	const recentOrders = await Order.find({
+		customer: req.user._id,
+		'foodItems.item': { $in: ids },
+	}).limit(5);
+	res.status(201).json({ recentOrders });
 });

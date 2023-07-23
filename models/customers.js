@@ -29,10 +29,9 @@ var Customer = new Schema(
 		picture: { type: String, default: '' },
 		tips: { type: Number, default: 0 },
 		rides: { type: Number, default: 0 },
-		rating: { type: Number, default: 0 },
 		reviews: { type: Number, default: 0 },
-		latitude: { type: 'String', default: '' },
-		longitude: { type: 'String', default: '' },
+		latitude: { type: Number, default: 0 },
+		longitude: { type: Number, default: 0 },
 		favourite: {
 			type: [
 				{
@@ -43,6 +42,7 @@ var Customer = new Schema(
 				},
 			],
 		},
+		speed: { type: Number, default: 20 },
 	},
 	{ timestamps: true }
 );

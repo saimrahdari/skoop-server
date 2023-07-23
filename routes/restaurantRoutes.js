@@ -41,6 +41,11 @@ router.get(
 	authenticate.verifyRestaurant,
 	restaurantController.getRestaurant
 );
+router.get(
+	'/datalastweek',
+	authenticate.verifyRestaurant,
+	restaurantController.getOrdersOfLastWeek
+);
 router.post('/register', restaurantController.register);
 router.post(
 	'/sign-in',
@@ -61,6 +66,16 @@ router.post(
 	'/add-fooddeal',
 	authenticate.verifyRestaurant,
 	restaurantController.addFoodDeal
+);
+router.patch(
+	'/edit-restaurant',
+	authenticate.verifyRestaurant,
+	restaurantController.editRestaurant
+);
+router.patch(
+	'/add-location',
+	authenticate.verifyRestaurant,
+	restaurantController.addLocation
 );
 router.patch('/reset-password', restaurantController.passwordReset);
 router.patch(

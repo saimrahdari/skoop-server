@@ -6,6 +6,7 @@ var Order = new Schema(
 		scooper: { type: mongoose.Types.ObjectId, ref: 'Customer' },
 		customer: { type: mongoose.Types.ObjectId, ref: 'Customer' },
 		address: { type: mongoose.Types.ObjectId, ref: 'DeliveryAddress' },
+		card: { type: mongoose.Types.ObjectId, ref: 'Payment_Method' },
 		status: { type: Number, default: 0 },
 		delivery_charges: { type: Number, default: 0 },
 		type: { type: String },
@@ -29,6 +30,14 @@ var Order = new Schema(
 		total: { type: Number },
 		subtotal: { type: Number },
 		cancelReason: { type: String, default: null },
+		scooperReview: {
+			reviewer: { type: mongoose.Types.ObjectId, ref: 'Customer' },
+			rating: { type: Number, default: 0 },
+			message: { type: String, default: '' },
+		},
+		restaurantTime: { type: Date, default: null },
+		completeTime: { type: Date, default: null },
+		remainingTime: { type: 'String', default: '' },
 	},
 	{ timestamps: true }
 );

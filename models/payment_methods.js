@@ -8,7 +8,7 @@ var Payment_Method = new Schema({
 	card_number: { type: Number },
 	cvc: { type: Number },
 	expiry_date: {
-		type: String,
+		type: Date,
 	},
 	user: {
 		type: mongoose.Types.ObjectId,

@@ -43,14 +43,10 @@ var Restaurant = new Schema(
 		},
 		address: { type: String, default: '' },
 		picture: { type: String, default: '' },
-		cover_photo: { type: String, default: '' },
 		open: { type: Boolean, default: false },
-		latitude: { type: String, default: '' },
-		longitude: { type: String, default: '' },
+		latitude: { type: Number },
+		longitude: { type: Number },
 		orders: { type: Number, default: 0 },
-		sales: { type: Number, default: 0 },
-		plan: { type: String, default: '' },
-		plan_ending_date: { type: Date, default: null },
 		reviews: {
 			type: [
 				{

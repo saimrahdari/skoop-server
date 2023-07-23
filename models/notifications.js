@@ -7,6 +7,14 @@ var NotificationCustomer = new Schema(
 			type: mongoose.Types.ObjectId,
 			ref: 'Customer',
 		},
+		scooper: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Customer',
+		},
+		restaurant: {
+			type: mongoose.Types.ObjectId,
+			ref: 'Restaurant',
+		},
 		message: {
 			type: String,
 		},

@@ -77,7 +77,27 @@ router.get(
 	authenticate.verifyCustomer,
 	customerController.getPizzaBurgerRestaurant
 );
+router.get(
+	'/getallcards',
+	authenticate.verifyCustomer,
+	customerController.getAllCards
+);
+router.get(
+	'/getsinglecard/:id',
+	authenticate.verifyCustomer,
+	customerController.getSingleCard
+);
+router.get(
+	'/recentorders-specificres/:id',
+	authenticate.verifyCustomer,
+	customerController.recentOrdersFromSpecificRestaurant
+);
 router.post('/register', customerController.register);
+router.post(
+	'/addcard',
+	authenticate.verifyCustomer,
+	customerController.addCard
+);
 router.post(
 	'/sign-in',
 	passport.authenticate('local'),
@@ -99,6 +119,11 @@ router.put(
 	customerController.addReview
 );
 router.patch('/reset-password', customerController.passwordReset);
+router.patch(
+	'/add-location',
+	authenticate.verifyCustomer,
+	customerController.addLocation
+);
 router.patch(
 	'/edit-customer',
 	authenticate.verifyCustomer,
@@ -128,6 +153,11 @@ router.patch(
 	'/cancel-order/:id',
 	authenticate.verifyCustomer,
 	customerController.cancelOrder
+);
+router.patch(
+	'/addscooperreview/:id',
+	authenticate.verifyCustomer,
+	customerController.addReviewOfSkooper
 );
 
 module.exports = router;

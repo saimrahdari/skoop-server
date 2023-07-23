@@ -123,6 +123,38 @@ exports.passwordChange = asyncHandler(async (req, res, next) => {
 	res.status(204).json();
 });
 
+exports.editRestaurant = asyncHandler(async (req, res, next) => {
+	let update = {
+		restaurant_name: req.body.restaurant_name,
+		email: req.body.email,
+		phone_number: req.body.phone_number,
+		category: req.body.category,
+		description: req.body.description,
+		address: req.body.address,
+	};
+	if (req.user.email !== req.body.email) {
+		var exists = await Restaurant.findOne({
+			email: req.body.email,
+		});
+		if (exists) {
+			return res.status(409).json({
+				message: 'Email already associated with a restaurant.',
+			});
+		}
+	}
+	await Restaurant.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json();
+});
+
+exports.addLocation = asyncHandler(async (req, res, next) => {
+	let update = {
+		latitude: req.body.latitude,
+		longitude: req.body.longitude,
+	};
+	await Restaurant.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json();
+});
+
 exports.addCategory = asyncHandler(async (req, res, next) => {
 	var exist = await FoodCategory.findOne({
 		restaurant: req.user._id,
@@ -231,8 +263,9 @@ exports.editFoodDeal = asyncHandler(async (req, res, next) => {
 		price: req.body.price,
 		description: req.body.description,
 		restaurant: req.user._id,
-		starting_date: req.body.starting_date,
-		ending_date: req.body.ending_date,
+		starting_time: req.body.starting_time,
+		ending_time: req.body.ending_time,
+		date: req.body.date,
 		food_items: req.body.foodItems,
 	};
 	await FoodDeals.findByIdAndUpdate(req.params.id, update);
@@ -263,4 +296,60 @@ exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
 		status: req.params.status,
 	});
 	res.status(200).json(orders);
+});
+
+exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {
+	const now = new Date();
+	const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+	const foodItems = await FoodItem.find({ restaurant: req.user._id });
+	var ids = [];
+	for (let i = 0; i < foodItems.length; i++) {
+		ids.push(foodItems[i]._id);
+	}
+	const result = await Order.aggregate([
+		{
+			$match: {
+				foodItems: { $elemMatch: { item: { $in: ids } } },
+				status: 3,
+				createdAt: { $gte: oneWeekAgo, $lte: now },
+			},
+		},
+		{
+			$group: {
+				_id: { $dayOfWeek: '$createdAt' },
+				count: { $sum: 1 },
+			},
+		},
+		{
+			$project: {
+				dayOfWeek: {
+					$let: {
+						vars: {
+							days: [
+								'Sunday',
+								'Monday',
+								'Tuesday',
+								'Wednesday',
+								'Thursday',
+								'Friday',
+								'Saturday',
+							],
+						},
+						in: {
+							$arrayElemAt: [
+								'$$days',
+								{ $subtract: ['$_id', 1] },
+							],
+						},
+					},
+				},
+				count: 1,
+				_id: 0,
+			},
+		},
+		{
+			$sort: { _id: 1 },
+		},
+	]);
+	res.status(200).json({ result });
 });
