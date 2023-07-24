@@ -43,6 +43,7 @@ exports.getPastRides = asyncHandler(async (req, res, next) => {
 
 exports.getRequests = asyncHandler(async (req, res, next) => {
 	const getRequests = await Order.find({
+		customer: { $ne: req.user._id },
 		status: 0,
 	}).populate('address');
 

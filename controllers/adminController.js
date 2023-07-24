@@ -9,6 +9,7 @@ var Admin = require('../models/admin');
 var Order = require('../models/orders');
 var Restaurant = require('../models/restaurants');
 var Otp = require('../models/otp');
+var FoodItem = require('../models/food_items');
 
 exports.register = async (req, res, next) => {
 	var exists = await Admin.findOne({ email: req.body.email });
@@ -132,11 +133,18 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 	for (let i = 0; i < allUsers.length; i++) {
 		var spentAmount = await Order.aggregate([
 			{ $match: { customer: allUsers[i]._id, status: 3 } },
-			{ $group: { _id: 'none', totalAmount: { $sum: '$total' } } },
+			{
+				$group: {
+					_id: 'none',
+					totalAmount: { $sum: '$total' },
+					rating: { $avg: '$scooperReview.rating' },
+				},
+			},
 		]);
 		var obj = {
 			user: allUsers[i],
 			totalSpent: spentAmount.length > 0 ? spentAmount[0].totalAmount : 0,
+			rating: spentAmount.length > 0 ? spentAmount[0].rating : 5,
 		};
 		finalData.push(obj);
 	}
@@ -160,6 +168,33 @@ exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
 
 	var finalData = [];
 	for (let i = 0; i < allRestaurants.length; i++) {
+		const foodItems = await FoodItem.find({
+			restaurant: [allRestaurants[i]._id],
+		});
+		var ids = [];
+		var totalEarning = 0;
+		for (let i = 0; i < foodItems.length; i++) {
+			ids.push(foodItems[i]._id);
+		}
+		const earnings = await Order.aggregate([
+			{ $unwind: '$foodItems' },
+			{
+				$match: {
+					'foodItems.item': { $in: ids },
+				},
+			},
+			{ $project: { foodItems: 1 } },
+		]);
+		for (let i = 0; i < earnings.length; i++) {
+			const elem = await FoodItem.findById(earnings[i].foodItems.item);
+			let cal = 0;
+			if (earnings[i].foodItems.quantity) {
+				cal = elem.price * earnings[i].foodItems.quantity;
+			} else {
+				cal = elem.price;
+			}
+			totalEarning += cal;
+		}
 		var ratings = await Restaurant.aggregate([
 			{ $match: { _id: allRestaurants[i]._id } },
 			{
@@ -175,6 +210,7 @@ exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
 		var obj = {
 			restaurant: allRestaurants[i],
 			rating: ratings.length > 0 ? ratings[0].rating : 5.0,
+			earnings: totalEarning,
 		};
 		finalData.push(obj);
 	}
@@ -221,7 +257,7 @@ exports.editUser = asyncHandler(async (req, res, next) => {
 				.json({ message: 'Email already associated with a user.' });
 		}
 	}
-	if (currentUser.email !== req.body.student_id) {
+	if (currentUser.student_id !== req.body.student_id) {
 		var exists = await Customer.findOne({
 			student_id: req.body.student_id,
 		});
@@ -239,6 +275,30 @@ exports.editUser = asyncHandler(async (req, res, next) => {
 	};
 	await Customer.findByIdAndUpdate(req.params.id, update);
 	res.status(204).json({});
+});
+
+exports.editRestaurant = asyncHandler(async (req, res, next) => {
+	var currentUser = await Restaurant.findById(req.params.id);
+	let update = {
+		restaurant_name: req.body.restaurant_name,
+		email: req.body.email,
+		phone_number: req.body.phone_number,
+		category: req.body.category,
+		description: req.body.description,
+		address: req.body.address,
+	};
+	if (currentUser.email !== req.body.email) {
+		var exists = await Restaurant.findOne({
+			email: req.body.email,
+		});
+		if (exists) {
+			return res.status(409).json({
+				message: 'Email already associated with a restaurant.',
+			});
+		}
+	}
+	await Restaurant.findByIdAndUpdate(req.user._id, update);
+	res.status(204).json();
 });
 
 exports.fullCustomerInformation = asyncHandler(async (req, res, next) => {
@@ -295,7 +355,7 @@ exports.fullScooperInformation = asyncHandler(async (req, res, next) => {
 	});
 });
 
-exports.getPastOrders = asyncHandler(async (req, res, next) => {
+exports.getPastOrdersCustomer = asyncHandler(async (req, res, next) => {
 	if (req.query.role === 'customer' || {}) {
 		const data = await Order.find({
 			customer: req.params.id,
@@ -309,4 +369,91 @@ exports.getPastOrders = asyncHandler(async (req, res, next) => {
 		}).populate('foodItems.item');
 		res.status(200).json(data);
 	}
+});
+
+exports.getPastOrdersRestaurant = asyncHandler(async (req, res, next) => {
+	const foodItems = await FoodItem.find({
+		restaurant: req.params.id,
+	});
+	var ids = [];
+	for (let i = 0; i < foodItems.length; i++) {
+		ids.push(foodItems[i]._id);
+	}
+	const data = await Order.find({
+		foodItems: { $in: ids },
+		status: 3,
+	}).populate('foodItems');
+	res.status(200).json(data);
+});
+
+exports.getFullOrderDetail = asyncHandler(async (req, res, next) => {
+	const order = await Order.findById(req.params.id)
+		.populate('customer')
+		.populate('scooper')
+		.populate('address');
+	res.status(200).json({ order });
+});
+
+exports.getSingleCustomerDetail = asyncHandler(async (req, res, next) => {
+	const customer = await Customer.findById(req.params.id);
+	const review = await Order.find({ scooper: req.params.id }).select(
+		'scooperReview'
+	);
+	res.status(200).json({ review, customer });
+});
+
+exports.getSingleRestaurantDetail = asyncHandler(async (req, res, next) => {
+	const restaurant = await Restaurant.findById(req.params.id);
+	const foodItems = await FoodItem.find({
+		restaurant: req.params.id,
+	});
+
+	var ids = [];
+	var totalEarning = 0;
+	for (let i = 0; i < foodItems.length; i++) {
+		ids.push(foodItems[i]._id);
+	}
+
+	const earnings = await Order.aggregate([
+		{ $unwind: '$foodItems' },
+		{
+			$match: {
+				'foodItems.item': { $in: ids },
+			},
+		},
+		{ $project: { foodItems: 1 } },
+	]);
+
+	for (let i = 0; i < earnings.length; i++) {
+		const elem = await FoodItem.findById(earnings[i].foodItems.item);
+		let cal = 0;
+		if (earnings[i].foodItems.quantity) {
+			cal = elem.price * earnings[i].foodItems.quantity;
+		} else {
+			cal = elem.price;
+		}
+		totalEarning += cal;
+	}
+
+	var ratings = await Restaurant.aggregate([
+		{ $match: { _id: req.params.id } },
+		{
+			$unwind: '$reviews',
+		},
+		{
+			$group: {
+				_id: '$_id',
+				rating: { $avg: '$reviews.stars' },
+			},
+		},
+	]);
+
+	var data = {
+		restaurant: restaurant,
+		rating: ratings.length > 0 ? ratings[0].rating : 5.0,
+		earnings: totalEarning,
+	};
+	res.status(200).json({
+		data: data,
+	});
 });

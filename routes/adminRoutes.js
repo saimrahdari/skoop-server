@@ -26,7 +26,27 @@ router.get(
 router.get(
 	'/pastorders/:id',
 	authenticate.verifyAdmin,
-	adminController.getPastOrders
+	adminController.getPastOrdersCustomer
+);
+router.get(
+	'/pastordersres/:id',
+	authenticate.verifyAdmin,
+	adminController.getPastOrdersRestaurant
+);
+router.get(
+	'/singleuserdetail/:id',
+	authenticate.verifyAdmin,
+	adminController.getSingleCustomerDetail
+);
+router.get(
+	'/singleresdetail/:id',
+	authenticate.verifyAdmin,
+	adminController.getSingleRestaurantDetail
+);
+router.get(
+	'/fullorderdetail/:id',
+	authenticate.verifyAdmin,
+	adminController.getFullOrderDetail
 );
 router.post('/register', adminController.register);
 router.post(
@@ -38,6 +58,11 @@ router.patch(
 	'/edit-user/:id',
 	authenticate.verifyAdmin,
 	adminController.editUser
+);
+router.patch(
+	'/edit-res/:id',
+	authenticate.verifyAdmin,
+	adminController.editRestaurant
 );
 router.delete(
 	'/delete-restaurant/:id',
