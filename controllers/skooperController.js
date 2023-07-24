@@ -60,7 +60,7 @@ exports.getRequests = asyncHandler(async (req, res, next) => {
 			point1.lon,
 			point2.lon
 		);
-		if (distanceKm < 10) {
+		if (distanceKm < 10000) {
 			finalRequests.push(getRequests[i]);
 		}
 	}

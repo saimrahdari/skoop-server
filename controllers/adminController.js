@@ -419,6 +419,7 @@ exports.getSingleRestaurantDetail = asyncHandler(async (req, res, next) => {
 		{
 			$match: {
 				'foodItems.item': { $in: ids },
+				status: 3,
 			},
 		},
 		{ $project: { foodItems: 1 } },
