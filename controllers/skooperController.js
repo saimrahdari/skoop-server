@@ -4,6 +4,7 @@ var Customer = require('../models/customers');
 var Order = require('../models/orders');
 var FoodItem = require('../models/food_items');
 var Restaurant = require('../models/restaurants');
+var Conversation = require('../models/conversation');
 
 //? Utility Functions
 const degreesToRadians = degrees => {
@@ -90,11 +91,15 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 		(distanceKm * 1000) / (req.user.speed * 16.667)
 	);
 	remainingTime = `${remainingTime} minutes`;
+	const newConversation = new Conversation({
+		members: [req.user._id, order.customer],
+	});
 	await Order.findByIdAndUpdate(req.params.id, {
 		scooper: req.user._id,
 		$inc: { status: 1 },
 		remainingTime,
 	});
+	await newConversation.save();
 	res.status(200).json({ message: 'Ride accepted' });
 });
 
