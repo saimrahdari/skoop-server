@@ -268,7 +268,6 @@ exports.getPizzaBurgerRestaurant = asyncHandler(async (req, res) => {
 
 exports.createOrder = asyncHandler(async (req, res) => {
 	await Order.create({
-		scooper: req.body.scooper,
 		customer: req.user._id,
 		address: req.body.address,
 		status: req.body.status,
