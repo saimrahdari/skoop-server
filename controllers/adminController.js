@@ -160,7 +160,7 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 });
 
 exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
-	req.totalRes = await Restaurant.countDocuments();
+	totalRes = await Restaurant.countDocuments();
 	const page = parseInt(req.query.page) || 1;
 	const perPage = 20;
 	const totalItems = await Restaurant.countDocuments();
