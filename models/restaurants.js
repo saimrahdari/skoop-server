@@ -8,6 +8,7 @@ var Restaurant = new Schema(
 			type: String,
 			default: '',
 		},
+        cancelled:{type:Number,default:0},
 		email: { type: String, default: '' },
 		phone_number: {
 			type: String,

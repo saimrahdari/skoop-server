@@ -462,3 +462,16 @@ exports.getSingleRestaurantDetail = asyncHandler(async (req, res, next) => {
 		data: data,
 	});
 });
+
+exports.findCustomersAndRestaurants = asyncHandler(async (req, res) => {
+	const query = req.query.name;
+	var customers = await Customer.find({
+		full_name: { $regex: new RegExp(query, 'i') },
+	});
+    var rest = await Restaurant.find({
+		restaurant_name: { $regex: new RegExp(query, 'i') },
+	});
+    var data = [...customers,rest];
+	res.status(200).json(data);
+});
+

@@ -382,6 +382,16 @@ exports.getPastOrder = asyncHandler(async (req, res) => {
 });
 
 exports.cancelOrder = asyncHandler(async (req, res) => {
+    var order = await Order.findById(req.params.id)
+    for (let i = 0; i < order.foodItems.length; i++) {
+		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
+			'restaurant'
+		);
+		await Restaurant.findByIdAndUpdate(rest.restaurant._id, {
+			$inc: { cancelled: 1 },
+		});
+	}
+    await Customer.findByIdAndUpdate(order.customer,{$inc:{cancelled_orders:1}});
 	let update = {
 		status: 4,
 		cancelReason: req.body.reason,

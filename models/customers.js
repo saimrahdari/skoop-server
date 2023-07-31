@@ -8,6 +8,8 @@ var Customer = new Schema(
 			type: String,
 			default: '',
 		},
+        cancelled_rides:{type:Number,default:0},
+        cancelled_orders:{type:Number,default:0},
 		role: {
 			type: String,
 			default: 'customer',

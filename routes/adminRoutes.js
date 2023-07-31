@@ -48,6 +48,11 @@ router.get(
 	authenticate.verifyAdmin,
 	adminController.getFullOrderDetail
 );
+router.get(
+	'/search',
+	authenticate.verifyAdmin,
+	adminController.findCustomersAndRestaurants
+);
 router.post('/register', adminController.register);
 router.post(
 	'/sign-in',
