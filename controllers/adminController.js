@@ -121,6 +121,7 @@ exports.newUsers = asyncHandler(async (req, res, next) => {
 });
 
 exports.getAllUsers = asyncHandler(async (req, res, next) => {
+	const totalUsers = await Customer.countDocuments();
 	const page = parseInt(req.query.page) || 1;
 	const perPage = 20;
 	const totalItems = await Customer.countDocuments();
@@ -154,10 +155,12 @@ exports.getAllUsers = asyncHandler(async (req, res, next) => {
 		currentPage: page,
 		perPage: perPage,
 		totalPages: totalPages,
+		totalUsers,
 	});
 });
 
 exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
+	req.totalRes = await Restaurant.countDocuments();
 	const page = parseInt(req.query.page) || 1;
 	const perPage = 20;
 	const totalItems = await Restaurant.countDocuments();
@@ -220,6 +223,7 @@ exports.getAllRestaurants = asyncHandler(async (req, res, next) => {
 		currentPage: page,
 		perPage: perPage,
 		totalPages: totalPages,
+		totalRes,
 	});
 });
 
