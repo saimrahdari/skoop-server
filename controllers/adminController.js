@@ -360,17 +360,17 @@ exports.fullScooperInformation = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPastOrdersCustomer = asyncHandler(async (req, res, next) => {
-	if (req.query.role === 'customer' || {}) {
+	if (req.query.role === 'customer') {
 		const data = await Order.find({
 			customer: req.params.id,
 			status: 3,
-		}).populate('foodItems');
+		}).populate('foodItems ');
 		res.status(200).json(data);
 	} else {
 		const data = await Order.find({
 			scooper: req.params.id,
 			status: 3,
-		}).populate('foodItems.item');
+		}).populate('foodItems.item scooperReview.reviewer');
 		res.status(200).json(data);
 	}
 });
