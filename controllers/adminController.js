@@ -290,6 +290,7 @@ exports.editRestaurant = asyncHandler(async (req, res, next) => {
 		category: req.body.category,
 		description: req.body.description,
 		address: req.body.address,
+		picture: req.body.picture,
 	};
 	if (currentUser.email !== req.body.email) {
 		var exists = await Restaurant.findOne({
@@ -468,10 +469,9 @@ exports.findCustomersAndRestaurants = asyncHandler(async (req, res) => {
 	var customers = await Customer.find({
 		full_name: { $regex: new RegExp(query, 'i') },
 	});
-    var rest = await Restaurant.find({
+	var rest = await Restaurant.find({
 		restaurant_name: { $regex: new RegExp(query, 'i') },
 	});
-    var data = [...customers,rest];
+	var data = [...customers, rest];
 	res.status(200).json(data);
 });
-

@@ -131,6 +131,7 @@ exports.editRestaurant = asyncHandler(async (req, res, next) => {
 		category: req.body.category,
 		description: req.body.description,
 		address: req.body.address,
+		picture: req.body.picture,
 	};
 	if (req.user.email !== req.body.email) {
 		var exists = await Restaurant.findOne({
