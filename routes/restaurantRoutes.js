@@ -89,6 +89,11 @@ router.patch(
 	restaurantController.editFoodCategory
 );
 router.patch(
+	'/opening',
+	authenticate.verifyRestaurant,
+	restaurantController.openCloseRestaurant
+);
+router.patch(
 	'/edit-fooditem/:id',
 	authenticate.verifyRestaurant,
 	restaurantController.editFoodItem

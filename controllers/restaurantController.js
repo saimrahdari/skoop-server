@@ -147,6 +147,15 @@ exports.editRestaurant = asyncHandler(async (req, res, next) => {
 	res.status(204).json();
 });
 
+exports.openCloseRestaurant = asyncHandler(async (req, res, next) => {
+	if (req.user.open) {
+		await Restaurant.findByIdAndUpdate(req.user._id, { open: false });
+	} else {
+		await Restaurant.findByIdAndUpdate(req.user._id, { open: true });
+	}
+	res.status(204).json();
+});
+
 exports.addLocation = asyncHandler(async (req, res, next) => {
 	let update = {
 		latitude: req.body.latitude,
