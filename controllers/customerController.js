@@ -13,6 +13,7 @@ var FoodCategory = require('../models/food_categories');
 var Order = require('../models/orders');
 var FoodItem = require('../models/food_items');
 var PaymentMethod = require('../models/payment_methods');
+var Report = require('../models/reports');
 
 exports.register = async (req, res, next) => {
 	var exists = await Customer.findOne({
@@ -244,6 +245,14 @@ exports.addReview = asyncHandler(async (req, res) => {
 		},
 		{ new: true, upset: false }
 	);
+	if (req.body.stars < 2) {
+		await Report.create({
+			customer: req.user._id,
+			type: true,
+			message: req.body.message,
+			restaurant: req.body.restaurantId,
+		});
+	}
 	res.status(204).json({});
 });
 
@@ -382,8 +391,8 @@ exports.getPastOrder = asyncHandler(async (req, res) => {
 });
 
 exports.cancelOrder = asyncHandler(async (req, res) => {
-    var order = await Order.findById(req.params.id)
-    for (let i = 0; i < order.foodItems.length; i++) {
+	var order = await Order.findById(req.params.id);
+	for (let i = 0; i < order.foodItems.length; i++) {
 		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
 			'restaurant'
 		);
@@ -391,7 +400,9 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
 			$inc: { cancelled: 1 },
 		});
 	}
-    await Customer.findByIdAndUpdate(order.customer,{$inc:{cancelled_orders:1}});
+	await Customer.findByIdAndUpdate(order.customer, {
+		$inc: { cancelled_orders: 1 },
+	});
 	let update = {
 		status: 4,
 		cancelReason: req.body.reason,
@@ -441,11 +452,19 @@ exports.getSingleCard = asyncHandler(async (req, res) => {
 });
 
 exports.addReviewOfSkooper = asyncHandler(async (req, res) => {
+	const order = await Order.findById(req.params.id);
 	let update = {
 		rating: req.body.rating,
 		reviewer: req.user._id,
 		message: req.body.message,
 	};
+	if (req.body.rating < 2) {
+		await Report.create({
+			customer: req.user._id,
+			scooper: order.scooper,
+			message: req.body.message,
+		});
+	}
 	await Order.findByIdAndUpdate(req.params.id, { scooperReview: update });
 	await Customer.findByIdAndUpdate(req.params.id, { $inc: { reviews: 1 } });
 	res.status(201).json({ message: 'Review added.' });

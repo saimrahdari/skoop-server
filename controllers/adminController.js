@@ -10,6 +10,7 @@ var Order = require('../models/orders');
 var Restaurant = require('../models/restaurants');
 var Otp = require('../models/otp');
 var FoodItem = require('../models/food_items');
+var Report = require('../models/reports');
 
 exports.register = async (req, res, next) => {
 	var exists = await Admin.findOne({ email: req.body.email });
@@ -395,7 +396,8 @@ exports.getFullOrderDetail = asyncHandler(async (req, res, next) => {
 	const order = await Order.findById(req.params.id)
 		.populate('customer')
 		.populate('scooper')
-		.populate('address');
+		.populate('address')
+		.populate('foodItems.item');
 	res.status(200).json({ order });
 });
 
@@ -475,3 +477,46 @@ exports.findCustomersAndRestaurants = asyncHandler(async (req, res) => {
 	var data = [...customers, rest];
 	res.status(200).json(data);
 });
+
+exports.getAllReportsScooperAndRestaurant = asyncHandler(
+	async (req, res, next) => {
+		if (req.query.type === 'true') {
+			const totalReports = await Report.find({ type: false });
+			const page = parseInt(req.query.page) || 1;
+			const perPage = 20;
+			const totalItems = totalReports.length;
+			const totalPages = Math.ceil(totalItems / perPage);
+			const allReports = await Report.find({ type: false })
+				.skip((page - 1) * perPage)
+				.limit(perPage)
+				.populate('customer')
+				.populate('scooper');
+
+			res.status(200).json({
+				reports: allReports,
+				totalItems: totalItems,
+				currentPage: page,
+				perPage: perPage,
+				totalPages: totalPages,
+			});
+		} else {
+			const totalReports = await Report.find({ type: true });
+			const page = parseInt(req.query.page) || 1;
+			const perPage = 20;
+			const totalItems = totalReports.length;
+			const totalPages = Math.ceil(totalItems / perPage);
+			const allReports = await Report.find({ type: true })
+				.skip((page - 1) * perPage)
+				.limit(perPage)
+				.populate('customer restaurant');
+
+			res.status(200).json({
+				reports: allReports,
+				totalItems: totalItems,
+				currentPage: page,
+				perPage: perPage,
+				totalPages: totalPages,
+			});
+		}
+	}
+);

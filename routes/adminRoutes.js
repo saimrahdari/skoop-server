@@ -44,6 +44,11 @@ router.get(
 	adminController.getSingleRestaurantDetail
 );
 router.get(
+	'/reports',
+	authenticate.verifyAdmin,
+	adminController.getAllReportsScooperAndRestaurant
+);
+router.get(
 	'/fullorderdetail/:id',
 	authenticate.verifyAdmin,
 	adminController.getFullOrderDetail
