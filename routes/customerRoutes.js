@@ -18,6 +18,16 @@ router.get(
 	customerController.getRestaurantWithCategoryItems
 );
 router.get(
+	'/getrestaurant/:id',
+	authenticate.verifyCustomer,
+	customerController.getRestaurant
+);
+router.get(
+	'/searchrestaurant',
+	authenticate.verifyCustomer,
+	customerController.searchRestaurant
+);
+router.get(
 	'/get-orders',
 	authenticate.verifyCustomer,
 	customerController.getOrders

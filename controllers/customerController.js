@@ -188,38 +188,6 @@ exports.switchRoles = asyncHandler(async (req, res) => {
 	res.status(204).json({});
 });
 
-exports.editCustomer = asyncHandler(async (req, res) => {
-	if (req.user.email !== req.body.email) {
-		var exists = await Customer.findOne({
-			email: req.body.email,
-		});
-		if (exists) {
-			return res
-				.status(409)
-				.json({ message: 'Email already associated with a user.' });
-		}
-	}
-	if (req.user.student_id !== req.body.student_id) {
-		var exists = await Customer.findOne({
-			student_id: req.body.student_id,
-		});
-		if (exists) {
-			return res.status(409).json({
-				message: 'Student-Id already associated with a user.',
-			});
-		}
-	}
-	let update = {
-		student_id: req.body.student_id,
-		email: req.body.email,
-		full_name: req.body.full_name,
-		picture: req.body.picture,
-		phone_number: req.body.phone_number,
-	};
-	await Customer.findByIdAndUpdate(req.user._id, update);
-	res.status(204).json({});
-});
-
 exports.addAddress = asyncHandler(async (req, res) => {
 	await DeliveryAddress.create(req.body);
 	res.status(201).json({});
@@ -368,6 +336,19 @@ exports.getRestaurantWithCategoryItems = asyncHandler(async (req, res) => {
 		finalData.push(obj);
 	}
 	res.status(200).json(finalData);
+});
+
+exports.getRestaurant = asyncHandler(async (req, res) => {
+	const restaurant = await Restaurant.findById(req.params.id);
+	res.status(200).json(restaurant);
+});
+
+exports.searchRestaurant = asyncHandler(async (req, res) => {
+	const query = req.query.name;
+	var rest = await Restaurant.find({
+		restaurant_name: { $regex: new RegExp(query, 'i') },
+	});
+	res.status(200).json(rest);
 });
 
 exports.getActiveOrder = asyncHandler(async (req, res) => {
