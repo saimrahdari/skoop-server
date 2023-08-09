@@ -28,6 +28,11 @@ router.get(
 	customerController.searchRestaurant
 );
 router.get(
+	'/get-singleaddress/:id',
+	authenticate.verifyCustomer,
+	customerController.searchRestaurant
+);
+router.get(
 	'/get-orders',
 	authenticate.verifyCustomer,
 	customerController.getOrders

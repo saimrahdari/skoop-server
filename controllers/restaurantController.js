@@ -11,6 +11,7 @@ var FoodCategory = require('../models/food_categories');
 var FoodItem = require('../models/food_items');
 var FoodDeals = require('../models/food_deals');
 var Order = require('../models/orders');
+var Customer = require('../models/customers');
 
 exports.register = async (req, res, next) => {
 	var exists = await Restaurant.findOne({ email: req.body.email });
@@ -203,6 +204,13 @@ exports.addFoodItem = asyncHandler(async (req, res, next) => {
 	res.status(204).json({});
 });
 
+exports.getSingleFoodItem = asyncHandler(async (req, res, next) => {
+	const foodItem = await FoodItem.findById(req.params.id).populate(
+		'food_category restaurant'
+	);
+	res.status(200).json({ foodItem });
+});
+
 exports.viewFoodCategory = asyncHandler(async (req, res, next) => {
 	const foodCategory = await FoodCategory.find({
 		restaurant: req.user._id,
@@ -318,6 +326,11 @@ exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
 		status: req.params.status,
 	});
 	res.status(200).json(orders);
+});
+
+exports.getCustomerDetails = asyncHandler(async (req, res, next) => {
+	const customer = await Customer.findById(req.params.id);
+	res.status(200).json(customer);
 });
 
 exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {

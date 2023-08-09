@@ -12,9 +12,19 @@ router.get(
 	restaurantController.getRestaurant
 );
 router.get(
+	'/get-singlefooditem/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.getSingleFoodItem
+);
+router.get(
 	'/get-ordersbystatus/:status',
 	authenticate.verifyRestaurant,
 	restaurantController.getOrdersByStatus
+);
+router.get(
+	'/get-customer/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.getCustomerDetails
 );
 router.get(
 	'/viewfoodcategory',

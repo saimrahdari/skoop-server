@@ -198,6 +198,11 @@ exports.getAddress = asyncHandler(async (req, res) => {
 	res.status(200).json({ addresses });
 });
 
+exports.getSingleAddress = asyncHandler(async (req, res) => {
+	const address = await DeliveryAddress.findById(req.params.id);
+	res.status(200).json({ address });
+});
+
 exports.addReview = asyncHandler(async (req, res) => {
 	await Restaurant.findByIdAndUpdate(
 		{ _id: req.body.restaurantId },
