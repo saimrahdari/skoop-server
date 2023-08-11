@@ -8,7 +8,6 @@ var Order = new Schema(
 		address: { type: mongoose.Types.ObjectId, ref: 'DeliveryAddress' },
 		status: { type: Number, default: 0 },
 		delivery_charges: { type: Number, default: 0 },
-		type: { type: String },
 		tip: { type: Number, default: 0 },
 		special_instructions: { type: String },
 		foodItems: {
@@ -19,6 +18,9 @@ var Order = new Schema(
 						ref: 'FoodItem',
 					},
 					quantity: {
+						type: Number,
+					},
+					price: {
 						type: Number,
 					},
 				},

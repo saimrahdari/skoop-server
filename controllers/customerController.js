@@ -266,7 +266,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
 		address: req.body.address,
 		status: req.body.status,
 		delivery_charges: req.body.delivery_charges,
-		type: req.body.type,
 		tip: req.body.tip,
 		special_instructions: req.body.special_instructions,
 		foodItems: req.body.foodItems,
