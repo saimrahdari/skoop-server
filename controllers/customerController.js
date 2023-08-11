@@ -14,6 +14,7 @@ var Order = require('../models/orders');
 var FoodItem = require('../models/food_items');
 var PaymentMethod = require('../models/payment_methods');
 var Report = require('../models/reports');
+var Admin = require('../models/admin');
 
 exports.register = async (req, res, next) => {
 	var exists = await Customer.findOne({
@@ -203,6 +204,13 @@ exports.getSingleAddress = asyncHandler(async (req, res) => {
 	res.status(200).json({ address });
 });
 
+exports.updateWallet = asyncHandler(async (req, res) => {
+	await Customer.findByIdAndUpdate(req.user._id, {
+		$inc: { balance: req.body.amount },
+	});
+	res.status(204).json({});
+});
+
 exports.addReview = asyncHandler(async (req, res) => {
 	await Restaurant.findByIdAndUpdate(
 		{ _id: req.body.restaurantId },
@@ -249,6 +257,10 @@ exports.getPizzaBurgerRestaurant = asyncHandler(async (req, res) => {
 });
 
 exports.createOrder = asyncHandler(async (req, res) => {
+	const user = await Customer.findById(req.user._id);
+	if (user.balance < req.body.total) {
+		return res.status(400).json({ message: 'Not enough balance' });
+	}
 	await Order.create({
 		customer: req.user._id,
 		address: req.body.address,
@@ -256,13 +268,18 @@ exports.createOrder = asyncHandler(async (req, res) => {
 		delivery_charges: req.body.delivery_charges,
 		type: req.body.type,
 		tip: req.body.tip,
-		payment_method: req.body.payment_method,
 		special_instructions: req.body.special_instructions,
 		foodItems: req.body.foodItems,
 		tax: req.body.tax,
 		total: req.body.total,
 		subtotal: req.body.subtotal,
-		card: req.body.card,
+	});
+	const admin = await Admin.findOne({ email: 'admin@gmail.com' });
+	await Customer.findByIdAndUpdate(user.id, {
+		$inc: { balance: -req.body.total },
+	});
+	await Admin.findByIdAndUpdate(admin.id, {
+		$inc: { wallet: req.body.total },
 	});
 	res.status(201).json({ message: 'Order Created Successfully.' });
 });
@@ -387,8 +404,9 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
 		});
 	}
 	await Customer.findByIdAndUpdate(order.customer, {
-		$inc: { cancelled_orders: 1 },
+		$inc: { cancelled_orders: 1, balance: order.total },
 	});
+
 	let update = {
 		status: 4,
 		cancelReason: req.body.reason,

@@ -87,6 +87,11 @@ router.patch(
 	authenticate.verifyRestaurant,
 	restaurantController.addLocation
 );
+router.patch(
+	'/cancel-order/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.cancelOrder
+);
 router.patch('/reset-password', restaurantController.passwordReset);
 router.patch(
 	'/change-password',

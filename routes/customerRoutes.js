@@ -145,6 +145,11 @@ router.patch(
 	customerController.editCustomer
 );
 router.patch(
+	'/update-wallet',
+	authenticate.verifyCustomer,
+	customerController.updateWallet
+);
+router.patch(
 	'/change-password',
 	passport.authenticate('local'),
 	customerController.passwordChange

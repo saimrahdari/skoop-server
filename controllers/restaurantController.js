@@ -12,6 +12,7 @@ var FoodItem = require('../models/food_items');
 var FoodDeals = require('../models/food_deals');
 var Order = require('../models/orders');
 var Customer = require('../models/customers');
+var Admin = require('../models/admin');
 
 exports.register = async (req, res, next) => {
 	var exists = await Restaurant.findOne({ email: req.body.email });
@@ -331,6 +332,33 @@ exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
 exports.getCustomerDetails = asyncHandler(async (req, res, next) => {
 	const customer = await Customer.findById(req.params.id);
 	res.status(200).json(customer);
+});
+
+exports.cancelOrder = asyncHandler(async (req, res) => {
+	var order = await Order.findById(req.params.id);
+	for (let i = 0; i < order.foodItems.length; i++) {
+		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
+			'restaurant'
+		);
+		await Restaurant.findByIdAndUpdate(rest.restaurant._id, {
+			$inc: { cancelled: 1 },
+		});
+	}
+	await Customer.findByIdAndUpdate(order.customer, {
+		$inc: { cancelled_orders: 1, balance: order.total },
+	});
+	await Admin.findOneAndUpdate(
+		{ email: 'admin@gmail.com' },
+		{
+			$inc: { wallet: -order.total },
+		}
+	);
+	let update = {
+		status: 4,
+		cancelReason: req.body.reason,
+	};
+	await Order.findByIdAndUpdate(req.params.id, update);
+	res.status(204).json({});
 });
 
 exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {

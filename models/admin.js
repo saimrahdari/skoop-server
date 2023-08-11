@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 
 var Admin = new Schema({
 	email: { type: String, default: '' },
+	wallet: { type: Number, default: 0 },
 });
 
 Admin.plugin(passportLocalMongoose, {
