@@ -30,7 +30,7 @@ router.get(
 router.get(
 	'/get-singleaddress/:id',
 	authenticate.verifyCustomer,
-	customerController.searchRestaurant
+	customerController.getSingleAddress
 );
 router.get(
 	'/get-orders',

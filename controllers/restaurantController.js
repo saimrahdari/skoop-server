@@ -355,7 +355,7 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
 	);
 	let update = {
 		status: 4,
-		cancelReason: req.body.reason,
+		cancelReason: 'Restaurant cancelled the order.',
 	};
 	await Order.findByIdAndUpdate(req.params.id, update);
 	res.status(204).json({});
