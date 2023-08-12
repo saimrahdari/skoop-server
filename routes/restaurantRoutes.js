@@ -22,6 +22,11 @@ router.get(
 	restaurantController.getOrdersByStatus
 );
 router.get(
+	'/get-singleaddress/:id',
+	authenticate.verifyCustomer,
+	restaurantController.getSingleAddress
+);
+router.get(
 	'/get-customer/:id',
 	authenticate.verifyRestaurant,
 	restaurantController.getCustomerDetails

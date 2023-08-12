@@ -13,6 +13,7 @@ var FoodDeals = require('../models/food_deals');
 var Order = require('../models/orders');
 var Customer = require('../models/customers');
 var Admin = require('../models/admin');
+var DeliveryAddress = require('../models/delivery_addresses');
 
 exports.register = async (req, res, next) => {
 	var exists = await Restaurant.findOne({ email: req.body.email });
@@ -327,6 +328,11 @@ exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
 		status: req.params.status,
 	});
 	res.status(200).json(orders);
+});
+
+exports.getSingleAddress = asyncHandler(async (req, res) => {
+	const address = await DeliveryAddress.findById(req.params.id);
+	res.status(200).json({ address });
 });
 
 exports.getCustomerDetails = asyncHandler(async (req, res, next) => {

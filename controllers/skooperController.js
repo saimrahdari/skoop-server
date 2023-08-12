@@ -113,8 +113,10 @@ exports.pickedFood = asyncHandler(async (req, res, next) => {
 });
 
 exports.cancelRide = asyncHandler(async (req, res, next) => {
-    var order = await Order.findById(req.params.id)
-    await Customer.findByIdAndUpdate(order.scooper,{$inc:{cancelled_rides:1}})
+	var order = await Order.findById(req.params.id);
+	await Customer.findByIdAndUpdate(order.scooper, {
+		$inc: { cancelled_rides: 1 },
+	});
 	await Order.findByIdAndUpdate(req.params.id, {
 		status: 0,
 		restaurantTime: null,
