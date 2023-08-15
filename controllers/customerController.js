@@ -405,7 +405,12 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
 	await Customer.findByIdAndUpdate(order.customer, {
 		$inc: { cancelled_orders: 1, balance: order.total },
 	});
-
+	await Admin.findOneAndUpdate(
+		{ email: 'admin@gmail.com' },
+		{
+			$inc: { wallet: -order.total },
+		}
+	);
 	let update = {
 		status: 4,
 		cancelReason: req.body.reason,

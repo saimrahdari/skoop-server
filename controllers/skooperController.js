@@ -154,15 +154,22 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
 		completeTime: Date.now(),
 		remainingTime: 'None',
 	});
+	await Admin.findOneAndUpdate(
+		{ email: 'admin@gmail.com' },
+		{
+			$inc: { wallet: -order.total },
+		}
+	);
+	let totalDeliveryCharges = order.delivery_charges + order.tip;
 	await Customer.findByIdAndUpdate(req.user._id, {
-		$inc: { tips: order.tip, rides: 1 },
+		$inc: { tips: order.tip, rides: 1, balance: totalDeliveryCharges },
 	});
 	for (let i = 0; i < order.foodItems.length; i++) {
 		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
 			'restaurant'
 		);
 		await Restaurant.findByIdAndUpdate(rest.restaurant._id, {
-			$inc: { orders: 1 },
+			$inc: { orders: 1, balance: order.foodItems[i].price },
 		});
 	}
 	res.status(200).json({ message: 'Order completed' });
