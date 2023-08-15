@@ -45,7 +45,15 @@ exports.getRequests = asyncHandler(async (req, res, next) => {
 	const getRequests = await Order.find({
 		customer: { $ne: req.user._id },
 		status: 0,
-	}).populate('address');
+	})
+		.populate('address')
+		.populate({
+			path: 'foodItems.item',
+			populate: {
+				path: 'restaurant',
+				model: 'Restaurant',
+			},
+		});
 
 	var finalRequests = [];
 	for (let i = 0; i < getRequests.length; i++) {

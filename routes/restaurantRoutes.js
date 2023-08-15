@@ -23,7 +23,7 @@ router.get(
 );
 router.get(
 	'/get-singleaddress/:id',
-	authenticate.verifyCustomer,
+	authenticate.verifyRestaurant,
 	restaurantController.getSingleAddress
 );
 router.get(
