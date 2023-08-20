@@ -79,7 +79,15 @@ exports.getCurrentAcceptedRequests = asyncHandler(async (req, res, next) => {
 	const acceptedRequests = await Order.find({
 		scooper: req.user._id,
 		$or: [{ status: 1 }, { status: 2 }],
-	});
+	})
+		.populate('address')
+		.populate({
+			path: 'foodItems.item',
+			populate: {
+				path: 'restaurant',
+				model: 'Restaurant',
+			},
+		});
 	res.status(200).json({ acceptedRequests });
 });
 
