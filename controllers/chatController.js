@@ -14,7 +14,7 @@ exports.createConversation = asyncHandler(async (req, res) => {
 exports.getConversations = asyncHandler(async (req, res) => {
 	const conversation = await Conversation.find({
 		members: { $in: [req.user._id] },
-	});
+	}).populate('members');
 	res.status(200).json(conversation);
 });
 
