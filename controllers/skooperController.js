@@ -5,6 +5,7 @@ var Order = require('../models/orders');
 var FoodItem = require('../models/food_items');
 var Restaurant = require('../models/restaurants');
 var Conversation = require('../models/conversation');
+var Admin = require('../models/admin');
 
 //? Utility Functions
 const degreesToRadians = degrees => {
