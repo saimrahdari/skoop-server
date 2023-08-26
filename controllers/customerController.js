@@ -372,6 +372,14 @@ exports.searchRestaurant = asyncHandler(async (req, res) => {
 	res.status(200).json(rest);
 });
 
+exports.searchFoodItem = asyncHandler(async (req, res) => {
+	const query = req.query.name;
+	var items = await FoodItem.find({
+		name: { $regex: new RegExp(query, 'i') },
+	});
+	res.status(200).json(items);
+});
+
 exports.getActiveOrder = asyncHandler(async (req, res) => {
 	const orders = await Order.find({
 		$and: [
