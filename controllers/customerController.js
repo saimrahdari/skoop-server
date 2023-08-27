@@ -364,6 +364,11 @@ exports.getRestaurant = asyncHandler(async (req, res) => {
 	res.status(200).json(restaurant);
 });
 
+exports.getCustomerById = asyncHandler(async (req, res) => {
+	const customer = await Customer.findById(req.params.id);
+	res.status(200).json(customer);
+});
+
 exports.searchRestaurant = asyncHandler(async (req, res) => {
 	const query = req.query.name;
 	var rest = await Restaurant.find({

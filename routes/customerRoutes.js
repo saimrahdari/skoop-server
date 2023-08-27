@@ -23,6 +23,11 @@ router.get(
 	customerController.getRestaurant
 );
 router.get(
+	'/getcustomer/:id',
+	authenticate.verifyCustomer,
+	customerController.getCustomerById
+);
+router.get(
 	'/searchrestaurant',
 	authenticate.verifyCustomer,
 	customerController.searchRestaurant
