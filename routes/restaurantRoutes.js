@@ -128,6 +128,11 @@ router.patch(
 	authenticate.verifyRestaurant,
 	restaurantController.addOpeningHours
 );
+router.patch(
+	'/updatewallet',
+	authenticate.verifyRestaurant,
+	restaurantController.updateWallet
+);
 router.delete(
 	'/delete-foodcategory/:fid',
 	authenticate.verifyRestaurant,

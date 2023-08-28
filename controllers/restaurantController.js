@@ -374,6 +374,13 @@ exports.deleteAccount = asyncHandler(async (req, res, next) => {
 	res.status(204).json({});
 });
 
+exports.updateWallet = asyncHandler(async (req, res) => {
+	await Restaurant.findByIdAndUpdate(req.user._id, {
+		$inc: { balance: -req.body.amount },
+	});
+	res.status(204).json({});
+});
+
 exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {
 	const now = new Date();
 	const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
