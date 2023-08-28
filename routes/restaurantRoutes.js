@@ -143,4 +143,9 @@ router.delete(
 	authenticate.verifyRestaurant,
 	restaurantController.deleteFoodDeal
 );
+router.delete(
+	'/delete/:id',
+	authenticate.verifyRestaurant,
+	restaurantController.deleteAccount
+);
 module.exports = router;

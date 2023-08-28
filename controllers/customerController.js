@@ -503,3 +503,10 @@ exports.recentOrdersFromSpecificRestaurant = asyncHandler(async (req, res) => {
 	}).limit(5);
 	res.status(201).json({ recentOrders });
 });
+
+exports.deleteAccount = asyncHandler(async (req, res, next) => {
+	await Customer.deleteOne({
+		_id: req.params.id,
+	});
+	res.status(204).json({});
+});

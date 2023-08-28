@@ -367,6 +367,13 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
 	res.status(204).json({});
 });
 
+exports.deleteAccount = asyncHandler(async (req, res, next) => {
+	await Restaurant.deleteOne({
+		_id: req.params.id,
+	});
+	res.status(204).json({});
+});
+
 exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {
 	const now = new Date();
 	const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
