@@ -4,26 +4,12 @@ var fcm = new FCM(serverKey);
 
 exports.sendPushNotification = async (ids, message) => {
 	try {
-		var message = {
-			to: [ids],
-			collapse_key: '',
-
-			notification: {
-				title: title,
-				body: message,
-			},
-
-			data: {
-				my_key: 'my value',
-				my_another_key: 'my another value',
-			},
-		};
-
 		var pushMessage = {
 			registration_ids: ids,
 			content_available: true,
 			mutable_content: true,
 			notification: {
+				title: 'Order Update',
 				body: message,
 				icon: 'myicon', //Default Icon
 				sound: 'mySound', //Default sound
