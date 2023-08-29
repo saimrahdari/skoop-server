@@ -1,4 +1,5 @@
 var asyncHandler = require('../middleware/asyncHandler');
+var notifications = require('../middleware/pushNotification');
 
 var Customer = require('../models/customers');
 var Order = require('../models/orders');
@@ -99,6 +100,19 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 		lat: order.address.latitude,
 		lon: order.address.longitude,
 	};
+
+	var ids = [];
+	for (let i = 0; i < order.foodItems.length; i++) {
+		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
+			'restaurant'
+		);
+		ids.push(rest.restaurant.fcm);
+	}
+	let messageRes = `${req.user.full_name} is coming to pick up order#${order.id}`;
+	let messageCus = `${req.user.full_name} has accepted to pick up your requested order#${order.id}`;
+	await notifications.sendPushNotification(ids, messageRes);
+	await notifications.sendPushNotification([order.customer], messageCus);
+
 	const distanceKm = calculateDistance(
 		point1.lat,
 		point2.lat,
