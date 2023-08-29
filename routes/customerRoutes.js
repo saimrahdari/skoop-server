@@ -189,5 +189,9 @@ router.patch(
 	authenticate.verifyCustomer,
 	customerController.addReviewOfSkooper
 );
-
+router.delete(
+	'/delete/:id',
+	authenticate.verifyCustomer,
+	customerController.deleteAccount
+);
 module.exports = router;

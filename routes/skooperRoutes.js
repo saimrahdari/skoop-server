@@ -55,10 +55,5 @@ router.patch(
 	authenticate.verifyCustomer,
 	skooperController.completeOrder
 );
-router.delete(
-	'/delete/:id',
-	authenticate.verifyCustomer,
-	restaurantController.deleteAccount
-);
 
 module.exports = router;
