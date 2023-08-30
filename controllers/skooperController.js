@@ -94,7 +94,9 @@ exports.getCurrentAcceptedRequests = asyncHandler(async (req, res, next) => {
 });
 
 exports.acceptRequest = asyncHandler(async (req, res, next) => {
-	const order = await Order.findById(req.params.id).populate('address');
+	const order = await Order.findById(req.params.id)
+		.populate('address')
+		.populate('customer');
 	const point1 = { lat: req.user.latitude, lon: req.user.longitude };
 	const point2 = {
 		lat: order.address.latitude,
@@ -111,7 +113,7 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 	let messageRes = `${req.user.full_name} is coming to pick up order#${order.id}`;
 	let messageCus = `${req.user.full_name} has accepted to pick up your requested order#${order.id}`;
 	await notifications.sendPushNotification(ids, messageRes);
-	await notifications.sendPushNotification([order.customer], messageCus);
+	await notifications.sendPushNotification([order.customer.fcm], messageCus);
 
 	const distanceKm = calculateDistance(
 		point1.lat,
@@ -136,6 +138,9 @@ exports.acceptRequest = asyncHandler(async (req, res, next) => {
 });
 
 exports.pickedFood = asyncHandler(async (req, res, next) => {
+	const order = await Order.findById(req.params.id).populate('customer');
+	let messageCus = `${req.user.full_name} has picked up food from the restaurants and is on his way to you`;
+	await notifications.sendPushNotification([order.customer.fcm], messageCus);
 	await Order.findByIdAndUpdate(req.params.id, {
 		$inc: { status: 1 },
 		restaurantTime: Date.now(),
@@ -144,7 +149,9 @@ exports.pickedFood = asyncHandler(async (req, res, next) => {
 });
 
 exports.cancelRide = asyncHandler(async (req, res, next) => {
-	var order = await Order.findById(req.params.id);
+	var order = await Order.findById(req.params.id).populate('customer');
+	let messageCus = `${req.user.full_name} has cancelled the ride.`;
+	await notifications.sendPushNotification([order.customer.fcm], messageCus);
 	await Customer.findByIdAndUpdate(order.scooper, {
 		$inc: { cancelled_rides: 1 },
 	});
@@ -195,14 +202,18 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
 	await Customer.findByIdAndUpdate(req.user._id, {
 		$inc: { tips: order.tip, rides: 1, balance: totalDeliveryCharges },
 	});
+	var ids = [];
 	for (let i = 0; i < order.foodItems.length; i++) {
 		const rest = await FoodItem.findById(order.foodItems[i].item).populate(
 			'restaurant'
 		);
+		ids.push(rest.restaurant.fcm);
 		await Restaurant.findByIdAndUpdate(rest.restaurant._id, {
 			$inc: { orders: 1, balance: order.foodItems[i].price },
 		});
 	}
+	let messageRes = `${req.user.full_name} has completed the order.`;
+	await notifications.sendPushNotification(ids, messageRes);
 	res.status(200).json({ message: 'Order completed' });
 });
 
