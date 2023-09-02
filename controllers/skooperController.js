@@ -7,6 +7,7 @@ var FoodItem = require('../models/food_items');
 var Restaurant = require('../models/restaurants');
 var Conversation = require('../models/conversation');
 var Admin = require('../models/admin');
+var Message = require('../models/messages');
 
 //? Utility Functions
 const degreesToRadians = degrees => {
@@ -214,6 +215,13 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
 	}
 	let messageRes = `${req.user.full_name} has completed the order.`;
 	await notifications.sendPushNotification(ids, messageRes);
+	const conversation = await Conversation.findOne({
+		members: {
+			$all: ['64dbc1e5cdd128b580f955bd', '646c665367972b07d5c4cae4'],
+		},
+	});
+	await Conversation.findByIdAndDelete(conversation._id);
+	await Message.deleteMany({ conversationId: conversation._id });
 	res.status(200).json({ message: 'Order completed' });
 });
 
