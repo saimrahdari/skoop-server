@@ -61,6 +61,11 @@ router.get(
 	authenticate.verifyRestaurant,
 	restaurantController.getOrdersOfLastWeek
 );
+router.get(
+	'/withdraw',
+	authenticate.verifyRestaurant,
+	restaurantController.withdrawRestaurant
+);
 router.post('/register', restaurantController.register);
 router.post(
 	'/sign-in',

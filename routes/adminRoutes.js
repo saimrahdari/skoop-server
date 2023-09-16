@@ -74,6 +74,11 @@ router.patch(
 	authenticate.verifyAdmin,
 	adminController.editRestaurant
 );
+router.patch(
+	'/withdraw/accept/:id',
+	authenticate.verifyAdmin,
+	adminController.withdrawAccept
+);
 router.delete(
 	'/delete-restaurant/:id',
 	authenticate.verifyAdmin,

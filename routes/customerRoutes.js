@@ -18,6 +18,11 @@ router.get(
 	customerController.getRestaurantWithCategoryItems
 );
 router.get(
+	'/withdraw',
+	authenticate.verifyCustomer,
+	customerController.withdrawCustomer
+);
+router.get(
 	'/getrestaurant/:id',
 	authenticate.verifyCustomer,
 	customerController.getRestaurant

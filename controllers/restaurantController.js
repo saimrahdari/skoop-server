@@ -436,3 +436,31 @@ exports.getOrdersOfLastWeek = asyncHandler(async (req, res, next) => {
 	]);
 	res.status(200).json({ result });
 });
+
+exports.withdrawRestaurant = asyncHandler(async (req, res, next) => {
+	var { title, iban, bankName, amount } = req.body;
+	let transport = nodemailer.createTransport({
+		host: 'smtp.gmail.com',
+		port: 465,
+		secure: true,
+		auth: {
+			user: process.env.EMAIL,
+			pass: process.env.EMAIL_PASSWORD,
+		},
+	});
+	const mailOptions = {
+		from: process.env.EMAIL,
+		to: 'abdurrehman283560@gmail.com',
+		subject: 'Withdraw Money',
+		text: `Account details: title:${title} account number:${iban} bank:${bankName}. The amount to be withdraw is ${amount}. Skoop restaurant account ID: ${req.user._id}`,
+	};
+	transport.sendMail(mailOptions, function (err, info) {
+		if (err) {
+			next(new ErrorHandler('Internal Server Error', 500));
+		} else {
+			res.status(200).json({
+				message: 'Your request is sent to the authorities.',
+			});
+		}
+	});
+});

@@ -520,3 +520,17 @@ exports.getAllReportsScooperAndRestaurant = asyncHandler(
 		}
 	}
 );
+
+exports.withdrawAccept = asyncHandler(async (req, res, next) => {
+	let { amount, customer } = req.body;
+	if (customer) {
+		await Customer.findByIdAndUpdate(req.params.id, {
+			$inc: { balance: -amount },
+		});
+	} else {
+		await Restaurant.findByIdAndUpdate(req.params.id, {
+			$inc: { balance: -amount },
+		});
+	}
+	res.status(200).json({ message: 'Amount transferred.' });
+});
