@@ -450,7 +450,7 @@ exports.withdrawRestaurant = asyncHandler(async (req, res, next) => {
 	});
 	const mailOptions = {
 		from: process.env.EMAIL,
-		to: 'abdurrehman283560@gmail.com',
+		to: 'admin@gmail.com',
 		subject: 'Withdraw Money',
 		text: `Account details: title:${title} account number:${iban} bank:${bankName}. The amount to be withdraw is ${amount}. Skoop restaurant account ID: ${req.user._id}`,
 	};
