@@ -18,7 +18,7 @@ exports.register = async (req, res, next) => {
 		next(new ErrorHandler('Email already associated with an account', 409));
 	} else {
 		try {
-			const admin = await Admin.register(
+			const admin = await Admin.registe(
 				new Admin({
 					email: req.body.email,
 				}),
@@ -450,7 +450,7 @@ exports.getSingleRestaurantDetail = asyncHandler(async (req, res, next) => {
 		},
 		{
 			$group: {
-				_id: '$_id',
+				_id: '$_id', 
 				rating: { $avg: '$reviews.stars' },
 			},
 		},
