@@ -89,5 +89,10 @@ router.delete(
 	authenticate.verifyAdmin,
 	adminController.deleteUser
 );
+router.get(
+	'currentAdmin',
+	authenticate.verifyAdmin,
+	adminController.getAdmin
+)
 
 module.exports = router;

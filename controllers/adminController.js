@@ -43,6 +43,10 @@ exports.register = async (req, res, next) => {
 	}
 };
 
+exports.getAdmin = asyncHandler(async (req, res) => {
+	res.json({ customer: req.user });
+});
+
 exports.signIn = asyncHandler(async (req, res) => {
 	let token = authenticate.getToken({ _id: req.user._id });
 	res.status(200).json({
