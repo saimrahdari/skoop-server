@@ -1,5 +1,5 @@
 var FCM = require('fcm-node');
-var serverKey = process.env.FCM_KEY;
+var serverKey = 'AAAAhQa92wU:APA91bFWOcrx7O6ylobwkOqkxe7MOLKYWYRtAZyeSu7toJGB8gq3Hanx3fJLtYCBnzTpUgrgONwnDm_qsZ10AUoogm2SIk_CP9FDuxurbGs17XnpC4wdVRhe6vocW7V4UH-Bz-eulZ39';
 var fcm = new FCM(serverKey);
 
 exports.sendPushNotification = async (ids, message) => {
