@@ -217,7 +217,7 @@ exports.completeOrder = asyncHandler(async (req, res, next) => {
 	await notifications.sendPushNotification(ids, messageRes);
 	const conversation = await Conversation.findOne({
 		members: {
-			$all: ['64dbc1e5cdd128b580f955bd', '646c665367972b07d5c4cae4'],
+			$all: [req.user.id, order.customer],
 		},
 	});
 	await Conversation.findByIdAndDelete(conversation._id);
